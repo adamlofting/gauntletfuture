@@ -1,7 +1,6 @@
 var mysql = require('mysql');
 var async = require('async');
 var util = require("./lib/util.js");
-var fs = require('fs');
 var csv = require('csv');
 var request = require('request');
 
@@ -279,4 +278,3 @@ function runImport () {
 }
 
 runImport();
-// TODO Save People Function
