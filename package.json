@@ -24,7 +24,8 @@
     "express": "~4.1.0",
     "async": "~0.7.0",
     "express3-handlebars": "~0.5.0",
-    "csv": "~0.3.7"
+    "csv": "~0.3.7",
+    "request": "~2.34.0"
   },
   "devDependencies": {
     "grunt-jsbeautifier": "~0.2.6",

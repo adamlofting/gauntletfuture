@@ -1,8 +1,9 @@
 var mysql = require('mysql');
 var async = require('async');
 var util = require("./lib/util.js");
-//var fs = require('fs');
+var fs = require('fs');
 var csv = require('csv');
+var request = require('request');
 
 var connectionOptions = {
   host: process.env.DB_HOST,
@@ -158,11 +159,7 @@ function savePeopleCounts(counts, callback) {
 }
 
 // PROCESSING
-function runImport() {
-  // read from CSV
-  // gather all values
-  // clear DB
-  // input into database
+function processCSV(fetchecCSV) {
   var amountsToSave = [];
   var allPeopleToSave = [];
 
@@ -191,7 +188,7 @@ function runImport() {
   }
 
   csv()
-    .from.path(__dirname + '/csv/test.csv', {
+    .from.string(fetchecCSV, {
       columns: true,
       delimiter: ',',
       escape: '"',
@@ -265,7 +262,20 @@ function runImport() {
     .on('error', function (error) {
       console.log(error.message);
     });
+}
 
+function runImport () {
+  // get the latest from Google
+    request.get('https://docs.google.com/spreadsheet/pub?key=0AvbQej-RMUQMdDFROXprcjNSVlQyV3hLOXRueWM1Qmc&single=true&gid=25&output=csv',
+      function (err, res, body) {
+        if (!err && res.statusCode === 200) {
+          var csv = body;
+          processCSV(csv);
+        } else {
+          console.log("Error fetching Google Doc");
+        }
+      }
+    );
 }
 
 runImport();
