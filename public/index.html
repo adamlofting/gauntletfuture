@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html class="no-js">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>MoFo Gauntlet Dashboard (in Development)</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,700" rel="stylesheet">
+        <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+        <link href="bower_components/makerstrap/dist/makerstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="css/main.css">
+    </head>
+    <body>
+
+
+    <div class=" dashboard-container">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="key-box"><!-- duplicated for responsive positioning -->
+              <p><span class="key dollars-new"></span> New $</p>
+              <p><span class="key dollars-total"></span> Total $</p>
+              <p><span class="key contributors-new"></span> New Contributors</p>
+              <p><span class="key contributors-total"></span> Total Contributors</p>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12" id="graph-container">
+            <svg id="chart" preserveAspectRatio="xMidYMid">
+            </svg>
+          </div>
+
+        </div>
+      </div> <!-- /container -->
+    </div>
+
+
+
+      <!-- GRAPHING WITH D3 -->
+      <script src="bower_components/d3/d3.min.js"></script>
+      <script src="bower_components/d3-tip/index.js"></script>
+
+      <script src="bower_components/jquery/dist/jquery.min.js"></script>
+      <script src="bower_components/jquery-number/jquery.number.min.js"></script>
+      <script src="bower_components/purl/purl.js"></script>
+
+      <script src="js/main.js"></script>
+
+    </body>
+</html>

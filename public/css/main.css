@@ -1,0 +1,235 @@
+body {
+  background: #333;
+}
+
+.dashboard-container {
+  background:  #333;
+  padding: 20px 0 40px;
+}
+
+.current-numbers {
+  color: #FFF;
+}
+
+.definition {
+  opacity: 0.5;
+}
+
+.key-box {
+  margin-left: 180px;
+}
+
+.key-box p {
+  display: inline;
+  float: left;
+  margin: 0 0 0 40px;
+  color: #FFF;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.key {
+  display: inline;
+  float: left;
+  width: 12px;
+  height: 12px;
+  background: #FFF;
+  margin: 4px 9px 0 0;
+}
+
+.key.dollars-total {
+  border-radius: 10px;
+}
+
+.key.dollars-new {
+  background: #fff;
+}
+
+.key.contributors-total {
+  border-radius: 10px;
+  background: #FECB33;
+}
+
+.key.contributors-new {
+  background: #FECB33;
+}
+
+.wm-footer {
+    padding: 40px 0px;
+    background-color: #013E5F;
+    color: #FFF;
+}
+
+footer h4 {
+  color: #028ED9;
+  margin-bottom: 5px;
+}
+
+footer h5 {
+  color: #02669D;
+  margin-top: 5px;
+}
+
+@media (min-width: 768px) {
+
+}
+
+@media (min-width: 992px) {
+
+}
+
+@media (min-width: 1200px) {
+
+}
+
+@media (max-width: 768px) {
+
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+
+}
+
+/* Styling for D3 SVG Graph */
+
+svg {
+  background:  #333;
+}
+
+.axis path {
+  fill: none;
+  stroke: rgba(255,255,255,0.2);
+  shape-rendering: crispEdges;
+}
+.axis {
+  font-size: 8pt;
+  font-family: Open Sans;
+  font-weight: normal;
+}
+.axis line {
+  fill: none;
+  stroke: rgba(255,255,255,0.2);
+  shape-rendering: crispEdges;
+}
+
+.tick {
+  fill: none;
+}
+.tick text {
+  fill: #FFF;
+  stroke: none;
+}
+.y2 .tick text {
+  fill: rgba(254, 203, 51, 1);
+}
+
+circle {
+  stroke: none;
+  fill: #fff;
+}
+
+circle.total-contributors {
+  stroke: none;
+  fill: rgba(254, 203, 51, 1);
+}
+
+circle.total-contributors.future-date {
+  stroke: none;
+  fill: rgba(254, 203, 51, 0.4);
+}
+
+.line.total-dollars {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+.line.total-contributors {
+  fill: none;
+  stroke: rgba(254, 203, 51, 1);
+  stroke-width: 1.5px;
+}
+
+.line.total-contributors.future-date {
+  stroke: rgba(254, 203, 51, 0.5);
+}
+
+
+rect.new-dollars {
+  fill: #fff;
+}
+
+rect.new-contributors {
+  fill: rgba(254, 203, 51, 1);
+}
+
+rect.new-contributors.future-date {
+  fill: rgba(254, 203, 51, 0.5);
+}
+
+line.target {
+    fill: none;
+    stroke: rgba(255,255,255,0.3);
+    opacity: 0.4;
+}
+
+line.target.goal {
+    fill: none;
+    stroke: #FFF;
+}
+
+/* future dollars */
+circle.future-date,
+rect.future-date {
+  fill: rgba(255, 255, 255, 0.5);
+}
+
+.line.total-dollars.future-date {
+  fill:none;
+  stroke: rgba(255, 255, 255, 0.5);
+}
+
+.line.total-contributors.future-date {
+  fill:none;
+  stroke: rgba(255, 255, 0, 0.5);
+}
+
+body rect {
+  color: #F00;
+}
+
+rect.info-area {
+  opacity: 0;
+  fill: #FFF;
+  position: relative;
+}
+
+.d3-tip {
+  line-height: 1.2;
+  font-weight: normal;
+  font-size: 10px;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #CCC;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 12px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -2px 0 0 0;
+  top: 100%;
+  left: 0;
+}

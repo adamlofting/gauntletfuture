@@ -2,9 +2,9 @@ var data      = require("./lib/data");
 var express = require("express");
 var app = express();
 
-app.get('/', function (req, res) {
-  res.send('Hello World!');
-});
+
+app.use(express.static(__dirname + '/public'));
+app.use('/bower_components', express.static(__dirname + '/bower_components'));
 
 app.get('/api/2014', function(req, res) {
   data.getDashBoardData(function getDashBoardData (err, result) {
