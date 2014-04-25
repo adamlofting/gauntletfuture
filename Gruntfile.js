@@ -20,6 +20,7 @@ module.exports = function (grunt) {
   var nodeJS = [
     'Gruntfile.js',
     'web.js',
+    'import.js',
     'lib/**/*.js',
     'routes/**/*.js',
     'test/**/*.js'
