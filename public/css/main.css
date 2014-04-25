@@ -2,6 +2,10 @@ body {
   background: #333;
 }
 
+h2 {
+  color: #FFF;
+}
+
 .dashboard-container {
   background:  #333;
   padding: 20px 0 40px;
@@ -16,13 +20,13 @@ body {
 }
 
 .key-box {
-  margin-left: 180px;
+
 }
 
 .key-box p {
   display: inline;
   float: left;
-  margin: 0 0 0 40px;
+  margin: 0 40px 0 5px;
   color: #FFF;
   font-size: 12px;
   line-height: 20px;
@@ -31,14 +35,17 @@ body {
 .key {
   display: inline;
   float: left;
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 16px;
   background: #FFF;
-  margin: 4px 9px 0 0;
+  margin: 2px 9px 0 0;
 }
 
 .key.dollars-total {
   border-radius: 10px;
+  width: 5px;
+  height: 5px;
+  margin-top: 8px;
 }
 
 .key.dollars-new {
@@ -48,6 +55,9 @@ body {
 .key.contributors-total {
   border-radius: 10px;
   background: #FECB33;
+  width: 5px;
+  height: 5px;
+  margin-top: 8px;
 }
 
 .key.contributors-new {

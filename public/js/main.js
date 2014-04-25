@@ -56,12 +56,12 @@ function draw(data) {
   // TOOL TIP
   var tip = d3.tip()
   .attr('class', 'd3-tip')
-  .offset([95, 0])
+  .offset([105, 0])
   .html(function(d) {
     return "Grants:<br/>" +
           "<span style='color:#FFF;'>$" + $.number(d.dollarRunningTotal) + "</span> Total<br />" +
           "<span style='color:#FFF;'>$" + $.number(d.dollarNew) + "</span> New<br /><br />" +
-          "Contributors:<br/>" +
+          "Potential Contributors:<br/>" +
           "<span style='color:#FECB33;'>" + $.number(d.contributorRunningTotal) + "</span> Total<br />" +
           "<span style='color:#FECB33;'>" + $.number(d.peopleNew) + "</span> New<br /><br />";
   });
@@ -299,7 +299,11 @@ function draw(data) {
   var y_axis = d3.svg.axis()
                 .scale(y_scale)
                 .orient("left")
-                .tickValues(TICK_VALUES);
+                .tickValues(TICK_VALUES)
+                .tickFormat(function (d) {
+                  var format_number = d3.format(["$", ""]);
+                  return format_number(d);
+                });
   d3.select("#chart")
   .append("g")
     .attr("class", "y axis")
