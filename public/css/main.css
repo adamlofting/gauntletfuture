@@ -188,6 +188,12 @@ line.target.goal {
     stroke: #FFF;
 }
 
+line.target.target2014 {
+    fill: none;
+    stroke: #F00;
+    opacity: 1;
+}
+
 /* future dollars */
 circle.future-date,
 rect.future-date {

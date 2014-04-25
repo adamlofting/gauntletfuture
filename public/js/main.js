@@ -1,5 +1,6 @@
 var GRAPH_DATA = "/api/2014";
 var TARGET = 10000000;
+var TARGET_2014 = 7000000;
 
 // Graph settings
 var Y_SCALE_2_MAX_DEFAULT = 10000;
@@ -99,8 +100,17 @@ function draw(data) {
     .attr("x2", margin.left + width)
     .attr("y1", y_scale(TARGET))
     .attr("y2", y_scale(TARGET))
+    .attr("class", "target milestone");
+
+  // ANNUAL TARGET
+  d3.select("#chart")
+    .append("line")
+    .attr("x1", margin.left)
+    .attr("x2", margin.left + width)
+    .attr("y1", y_scale(TARGET_2014))
+    .attr("y2", y_scale(TARGET_2014))
     .style("stroke-dasharray", ("3, 3"))
-    .attr("class", "target goal");
+    .attr("class", "target target2014 milestone");
 
   // Bars
   var barWidth = width / data.length;
