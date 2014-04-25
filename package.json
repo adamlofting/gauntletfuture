@@ -1,0 +1,33 @@
+{
+  "name": "gauntletfuture",
+  "version": "0.0.0",
+  "description": "money money money",
+  "main": "web.js",
+  "engines": {
+    "node": "0.10.x"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adamlofting/gauntletfuture.git"
+  },
+  "author": "Adam Lofting",
+  "license": "MPL2",
+  "bugs": {
+    "url": "https://github.com/adamlofting/gauntletfuture/issues"
+  },
+  "homepage": "https://github.com/adamlofting/gauntletfuture",
+  "dependencies": {
+    "mysql": "~2.1.1",
+    "express": "~4.1.0",
+    "async": "~0.7.0",
+    "express3-handlebars": "~0.5.0"
+  },
+  "devDependencies": {
+    "grunt-jsbeautifier": "~0.2.6",
+    "grunt": "~0.4.4",
+    "grunt-contrib-jshint": "~0.9.2"
+  }
+}
