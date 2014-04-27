@@ -200,7 +200,7 @@ function processCSV(fetchecCSV) {
         'prospect2014predictiondollar',
         'prospectlikelihood',
         'prospect2014dollar',
-        'prospect2014contributor'
+        'prospect2014predictioncontributor'
       ]
     })
     .transform(function (row) {
@@ -222,9 +222,9 @@ function processCSV(fetchecCSV) {
         console.log("* Closed yes date and contributor");
         addToPeople(row.closedyesdate, row.closed2014contributor);
       }
-      if (row.prospectyesdate && row.prospect2014contributor) {
+      if (row.prospectyesdate && row.prospect2014predictioncontributor) {
         console.log("* Prospect yes date and contributor");
-        addToPeople(row.prospectyesdate, row.prospect2014contributor);
+        addToPeople(row.prospectyesdate, row.prospect2014predictioncontributor);
       }
       console.log(' ');
       console.log('Raw row:');
