@@ -197,7 +197,7 @@ function processCSV(fetchecCSV) {
         'closed2014dollar',
         'closed2014contributor',
         'prospectyesdate',
-        'prospect2014prediction',
+        'prospect2014predictiondollar',
         'prospectlikelihood',
         'prospect2014dollar',
         'prospect2014contributor'
@@ -212,10 +212,10 @@ function processCSV(fetchecCSV) {
         console.log("* Closed yes date and dollar");
         addToAmounts(row.closedyesdate, row.closed2014dollar);
       }
-      if (row.prospectyesdate && row.prospect2014prediction) {
+      if (row.prospectyesdate && row.prospect2014predictiondollar) {
         console.log("* Prospect yes date and dollar");
-        console.log("TEST",row.prospect2014prediction);
-        addToAmounts(row.prospectyesdate, row.prospect2014prediction);
+        console.log("TEST",row.prospect2014predictiondollar);
+        addToAmounts(row.prospectyesdate, row.prospect2014predictiondollar);
       }
       // Contributors
       if (row.closedyesdate && row.closed2014contributor) {
