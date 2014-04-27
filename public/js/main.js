@@ -95,10 +95,8 @@ function draw(data, targetSelector, targetLine, year) {
     .domain([0,y_scale_2_max]);
 
   // X SCALE TIME
-  var time_extent = d3.extent(data, function (d) { return new Date(d.monthCommencing); });
-  var startDate = time_extent[0];
-  var endDate = new Date(time_extent[1]);
-  endDate = new Date(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDay());
+  var startDate = new Date(year, 0, 1);
+  var endDate = new Date(year , 11, 31);
   var x_scale = d3.time.scale()
     .domain([startDate, endDate])
     .range([margin.left, margin.left + width]);
@@ -106,7 +104,7 @@ function draw(data, targetSelector, targetLine, year) {
   // TOOL TIP
   var tip = d3.tip()
   .attr('class', 'd3-tip')
-  .offset([105, 0])
+  .offset([0, 0])
   .html(function(d) {
     return "Grants:<br/>" +
           "<span style='color:#FFF;'>$" + $.number(d.dollarRunningTotal) + "</span> Total<br />" +
@@ -186,7 +184,7 @@ function draw(data, targetSelector, targetLine, year) {
   /**
    * BARS
    */
-  var barWidth = width / data.length;
+  var barWidth = (width / data.length) -10;
   var halfBar = (barWidth / 2);
 
   /**
@@ -394,7 +392,7 @@ function draw(data, targetSelector, targetLine, year) {
     .attr("y", 0)
     .attr("x", 0)
     .attr("dy", ".35em")
-    .attr("transform", "rotate(270) translate(-35,0)")
+    .attr("transform", "rotate(270) translate(-35,"+(halfBar-2)+")")
     .style("text-anchor", "start");
 
   // Y-AXIS LEFT (dollar scale)
@@ -427,9 +425,9 @@ function draw(data, targetSelector, targetLine, year) {
 
 // Draw the D3 chart
 d3.json(GRAPH_DATA_2014, function (data) {
-  draw(data, '#chart1', 7000000);
+  draw(data, '#chart1', 7000000, 2014);
 });
 
 d3.json(GRAPH_DATA_2015, function (data) {
-  draw(data, '#chart2', 7000000);
+  draw(data, '#chart2', 7000000, 2015);
 });

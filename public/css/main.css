@@ -2,7 +2,9 @@ body {
   background: #333;
 }
 
-h2 {
+
+
+h2, h3, h5 {
   color: #FFF;
 }
 
@@ -20,13 +22,13 @@ h2 {
 }
 
 .key-box {
-
+ float: right;
 }
 
 .key-box p {
   display: inline;
   float: left;
-  margin: 0 40px 0 5px;
+  margin: 0 10px 0 5px;
   color: #FFF;
   font-size: 12px;
   line-height: 20px;
@@ -38,13 +40,13 @@ h2 {
   width: 10px;
   height: 16px;
   background: #FFF;
-  margin: 2px 9px 0 0;
+  margin: 2px 5px 0 0;
 }
 
 .key.dollars-total {
   border-radius: 10px;
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   margin-top: 8px;
 }
 
@@ -55,13 +57,25 @@ h2 {
 .key.contributors-total {
   border-radius: 10px;
   background: #FECB33;
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   margin-top: 8px;
 }
 
 .key.contributors-new {
   background: #FECB33;
+}
+
+.contributors-key,
+.dollar-key {
+  display: inline;
+  float: right;
+  margin-right: 60px;
+}
+
+.contributors-key p,
+.contributors-key h5 {
+  color: #FECB33;
 }
 
 .wm-footer {
@@ -129,6 +143,11 @@ svg {
   fill: #FFF;
   stroke: none;
 }
+
+.tick line {
+  display: none;
+}
+
 .y2 .tick text {
   fill: rgba(254, 203, 51, 1);
 }
@@ -223,7 +242,7 @@ rect.info-area {
   font-weight: normal;
   font-size: 10px;
   padding: 6px;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 1);
   color: #CCC;
   border-radius: 2px;
 }
@@ -235,7 +254,7 @@ rect.info-area {
   font-size: 12px;
   width: 100%;
   line-height: 1;
-  color: rgba(0, 0, 0, 0.8);
+  color: rgba(0, 0, 0, 1);
   content: "\25BC";
   position: absolute;
   text-align: center;
@@ -246,4 +265,8 @@ rect.info-area {
   margin: -2px 0 0 0;
   top: 100%;
   left: 0;
+}
+
+.row.year {
+  margin-top: 30px;
 }
