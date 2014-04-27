@@ -69,6 +69,38 @@ function draw(data) {
 
   d3.select("#chart").call(tip);
 
+  // Re-usable hatch pattern -- .attr('fill', 'url(#diagonalHatchDollars)');
+  d3.select("#chart")
+  .append('defs')
+  .append('pattern')
+    .attr('id', 'diagonalHatchDollars')
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('width', 4)
+    .attr('height', 2)
+  // .append('path')
+  //   .attr('d', 'M0 5L5 0ZM6 4L4 6ZM-1 1L1 -1Z')
+  //   .attr('stroke', '#AAA')
+  //   .attr('stroke-width', 1);
+  .append('rect')
+    .attr('fill', '#FFF')
+    .attr('width', 4)
+    .attr('height', 1)
+    .attr('opacity', 0.5);
+
+  // Re-usable hatch pattern -- .attr('fill', 'url(#diagonalHatchPeople)');
+  d3.select("#chart")
+  .append('defs')
+  .append('pattern')
+    .attr('id', 'diagonalHatchPeople')
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('width', 4)
+    .attr('height', 2)
+  .append('rect')
+    .attr('fill', '#FECB33')
+    .attr('width', 4)
+    .attr('height', 1)
+    .attr('opacity', 0.5);
+
   // REFERENCE LINES
   d3.select("#chart")
     .append("line")
@@ -109,7 +141,7 @@ function draw(data) {
     .attr("x2", margin.left + width)
     .attr("y1", y_scale(TARGET_2014))
     .attr("y2", y_scale(TARGET_2014))
-    .style("stroke-dasharray", ("3, 3"))
+    //.style("stroke-dasharray", ("1, 1"))
     .attr("class", "target target2014 milestone");
 
   // Bars
@@ -155,12 +187,13 @@ function draw(data) {
         if (new Date(d.monthCommencing) > now) {
           return "new-dollars future-date";
         } else {
-          return "new-dollars";
+          return "new-dollars past-date";
         }
       })
       .attr("y",          function (d) { return y_scale(d.dollarNew); })
       .attr("height",     function (d) { return height+margin.top - y_scale(d.dollarNew); })
-      .attr("width", halfBar - 1);
+      .attr("width", halfBar - 1)
+      .attr('fill', 'url(#diagonalHatchDollars)');
 
   // Position these elements on the X axis using their date value
   d3.select("#chart").selectAll(".new-dollars")
@@ -176,12 +209,13 @@ function draw(data) {
         if (new Date(d.monthCommencing) > now) {
           return "new-contributors future-date";
         } else {
-          return "new-contributors";
+          return "new-contributors past-date";
         }
       })
       .attr("y",          function (d) { return y_scale_2(d.peopleNew); })
       .attr("height",     function (d) { return height+margin.top - y_scale_2(d.peopleNew); })
-      .attr("width", halfBar - 1);
+      .attr("width", halfBar - 1)
+      .attr('fill', 'url(#diagonalHatchPeople)');
 
   // Position these elements on the X axis using their date value
   d3.select("#chart").selectAll(".new-contributors")
@@ -190,7 +224,7 @@ function draw(data) {
   // Total dollars
   // Line
   var line = d3.svg.line()
-    .x(function (d) { return x_scale(new Date(d.monthCommencing)) + halfBar/2; })
+    .x(function (d) { return x_scale(new Date(d.monthCommencing)) + halfBar; })
     .y(function (d) { return y_scale(d.dollarRunningTotal); });
 
   // line to date
@@ -211,6 +245,7 @@ function draw(data) {
       })
     )
     .attr("class", "line total-dollars future-date")
+    .style("stroke-dasharray", ("2, 2"))
     .attr("d", line);
 
   // Points
@@ -228,7 +263,7 @@ function draw(data) {
     });
 
   d3.select("#chart").selectAll(".total-dollars")
-    .attr("cx", function (d) { return x_scale(new Date(d.monthCommencing)) + halfBar/2; })
+    .attr("cx", function (d) { return x_scale(new Date(d.monthCommencing)) + halfBar; })
     .attr("cy", function (d) { return y_scale(d.dollarRunningTotal); })
     .attr("r", function (d) {
       return 2.0;
@@ -237,7 +272,7 @@ function draw(data) {
   // Total Contributors
   // Line
   var line2 = d3.svg.line()
-    .x(function (d) { return x_scale(new Date(d.monthCommencing)) + halfBar + (halfBar/2); })
+    .x(function (d) { return x_scale(new Date(d.monthCommencing)) + halfBar; })
     .y(function (d) { return y_scale_2(d.contributorRunningTotal); });
 
   // line to date
@@ -258,6 +293,7 @@ function draw(data) {
       })
     )
     .attr("class", "line total-contributors future-date")
+    .style("stroke-dasharray", ("2, 2"))
     .attr("d", line2);
 
   // Points
@@ -275,7 +311,7 @@ function draw(data) {
     });
 
   d3.select("#chart").selectAll(".total-contributors")
-    .attr("cx", function (d) { return x_scale(new Date(d.monthCommencing)) + halfBar + (halfBar/2); })
+    .attr("cx", function (d) { return x_scale(new Date(d.monthCommencing)) + halfBar; })
     .attr("cy", function (d) { return y_scale_2(d.contributorRunningTotal); })
     .attr("r", function (d) {
       return 2.0;

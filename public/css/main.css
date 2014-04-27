@@ -145,7 +145,7 @@ circle.total-contributors {
 
 circle.total-contributors.future-date {
   stroke: none;
-  fill: rgba(254, 203, 51, 0.4);
+  fill: rgba(254, 203, 51, 1);
 }
 
 .line.total-dollars {
@@ -165,16 +165,16 @@ circle.total-contributors.future-date {
 }
 
 
-rect.new-dollars {
+rect.new-dollars.past-date {
   fill: #fff;
 }
 
-rect.new-contributors {
+rect.new-contributors.past-date {
   fill: rgba(254, 203, 51, 1);
 }
 
 rect.new-contributors.future-date {
-  fill: rgba(254, 203, 51, 0.5);
+  /*fill: rgba(254, 203, 51, 0.5);*/
 }
 
 line.target {
@@ -190,14 +190,17 @@ line.target.goal {
 
 line.target.target2014 {
     fill: none;
-    stroke: #F00;
+    stroke: #FFF;
     opacity: 1;
 }
 
 /* future dollars */
-circle.future-date,
+circle.future-date {
+  fill: rgba(255, 255, 255, 1);
+}
+
 rect.future-date {
-  fill: rgba(255, 255, 255, 0.5);
+
 }
 
 .line.total-dollars.future-date {
