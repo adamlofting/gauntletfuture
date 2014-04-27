@@ -29,6 +29,8 @@ d3.select("#chart")
 // Build the graph
 function draw(data) {
   var now = new Date();
+  var lastMonth = new Date();
+  lastMonth.setDate(now.getDate()-31);
 
   // SCALE
   var y_scale_max = Y_SCALE_MAX_DEFAULT;
@@ -241,7 +243,7 @@ function draw(data) {
   d3.select("#chart")
     .append("path")
     .datum(data.filter(function (d) {
-        return (d.dollarRunningTotal > 0 && (new Date(d.monthCommencing) > now));
+        return (d.dollarRunningTotal > 0 && (new Date(d.monthCommencing) > lastMonth));
       })
     )
     .attr("class", "line total-dollars future-date")
@@ -289,7 +291,7 @@ function draw(data) {
   d3.select("#chart")
     .append("path")
     .datum(data.filter(function (d) {
-        return (d.contributorRunningTotal > 0 && (new Date(d.monthCommencing) > now));
+        return (d.contributorRunningTotal > 0 && (new Date(d.monthCommencing) > lastMonth));
       })
     )
     .attr("class", "line total-contributors future-date")
