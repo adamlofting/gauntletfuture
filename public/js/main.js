@@ -14,7 +14,7 @@ var margin = {top: 20, right: 80, bottom: 45, left: 80};
   margin.horizontal = margin.left + margin.right;
 
 var width = 1000 - margin.horizontal,
-    height = 600 - margin.vertical;
+    height = 500 - margin.vertical;
 
 var VIEWBOX = "0 0 " + (width + margin.horizontal) + " " + (height + margin.vertical);
 
