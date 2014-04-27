@@ -1,59 +1,106 @@
-var GRAPH_DATA = "/api/2014";
-var TARGET = 10000000;
-var TARGET_2014 = 7000000;
+var GRAPH_DATA_2014 = "/api/2014";
+var GRAPH_DATA_2015 = "/api/2015";
 
-// Graph settings
-var Y_SCALE_2_MAX_DEFAULT = 10000;
-var Y_SCALE_MAX_DEFAULT = TARGET * 1.25;
-var TARGET_25_percent = Math.round(TARGET * 0.25),
-    TARGET_50_percent = Math.round(TARGET * 0.5),
-    TARGET_75_percent = Math.round(TARGET * 0.75);
+/**
+ * RESPONSIVE
+ * Make the SVG charts scale with responsive container divs
+ */
+var chart1 = $("#chart1"),
+    aspect1 = chart1.width() / chart1.height(),
+    container1 = chart1.parent();
 
-var margin = {top: 20, right: 80, bottom: 45, left: 80};
-  margin.vertical = margin.top + margin.bottom;
-  margin.horizontal = margin.left + margin.right;
+var chart2 = $("#chart2"),
+    aspect2 = chart2.width() / chart2.height(),
+    container2 = chart2.parent();
 
-var width = 1000 - margin.horizontal,
-    height = 500 - margin.vertical;
+function resize_charts () {
+  var targetWidth1 = container1.width();
+  chart1.attr("width", targetWidth1);
+  chart1.attr("height", Math.round(targetWidth1 / aspect1));
 
-var VIEWBOX = "0 0 " + (width + margin.horizontal) + " " + (height + margin.vertical);
+  var targetWidth2 = container2.width();
+  chart2.attr("width", targetWidth2);
+  chart2.attr("height", Math.round(targetWidth2 / aspect2));
+}
 
-var TICK_VALUES = [TARGET_25_percent, TARGET_50_percent, TARGET_75_percent, TARGET, Y_SCALE_MAX_DEFAULT];
+$(window).on("resize", function() {
+    resize_charts();
+}).trigger("resize");
 
-// CONTAINER
-d3.select("#chart")
-  .attr("width", width + margin.horizontal)
-  .attr("height", height + margin.vertical)
-  .attr("viewBox", VIEWBOX); // this is used for SVG proportional resizing
 
-// Build the graph
-function draw(data) {
+/**
+ *
+ * DRAW A GRAPH
+ *
+ */
+function draw(data, targetSelector, targetLine, year) {
+  var chart = d3.select(targetSelector);
+  var TARGET = targetLine;
+
+  // utitlity vars
   var now = new Date();
   var lastMonth = new Date();
   lastMonth.setDate(now.getDate()-31);
 
-  // SCALE
-  var y_scale_max = Y_SCALE_MAX_DEFAULT;
-  var contributor_extent = d3.extent(data, function (d) { return d.dollarRunningTotal; });
-  if (contributor_extent[1] > y_scale_max) {
-    y_scale_max = contributor_extent[1];
-  }
+  // Graph settings
+  var Y_SCALE_2_MAX_DEFAULT = 10000;
+  var Y_SCALE_MAX_DEFAULT = TARGET * 1.25;
+  var TARGET_25_percent = Math.round(TARGET * 0.25),
+      TARGET_50_percent = Math.round(TARGET * 0.5),
+      TARGET_75_percent = Math.round(TARGET * 0.75);
 
-  var y_scale_2_max = Y_SCALE_2_MAX_DEFAULT;
+  var margin = {top: 20, right: 80, bottom: 45, left: 80};
+      margin.vertical = margin.top + margin.bottom;
+      margin.horizontal = margin.left + margin.right;
+
+  var width = 1200 - margin.horizontal,
+      height = 600 - margin.vertical;
+
+  var VIEWBOX = "0 0 " + (width + margin.horizontal) + " " + (height + margin.vertical);
+
+  var TICK_VALUES = [TARGET_25_percent, TARGET_50_percent, TARGET_75_percent, TARGET, Y_SCALE_MAX_DEFAULT];
+
+  /**
+   * CONTATINER
+   */
+  chart
+    .attr("width", width + margin.horizontal)
+    .attr("height", height + margin.vertical)
+    .attr("viewBox", VIEWBOX); // this is used for SVG proportional resizing
+
+  /**
+   * SCALES
+   */
+
+  // Y SCALE LEFT (Dollars)
+  var y_scale_max = Y_SCALE_MAX_DEFAULT;
+  var extent_dollars = d3.extent(data, function (d) { return d.dollarRunningTotal; });
+  if (extent_dollars[1] > y_scale_max) {
+    y_scale_max = extent_dollars[1];
+  }
 
   var y_scale = d3.scale.linear()
     .range([height + margin.top, margin.top])
     .domain([0,y_scale_max]);
 
+  // Y SCALE RIGHT (Contributors)
+  var y_scale_2_max = Y_SCALE_2_MAX_DEFAULT;
+  var extent_contributors = d3.extent(data, function (d) { return d.contributorRunningTotal; });
+  if (extent_contributors[1] > y_scale_2_max) {
+    y_scale_2_max = extent_contributors[1];
+  }
+
   var y_scale_2 = d3.scale.linear()
     .range([height + margin.top, margin.top])
     .domain([0,y_scale_2_max]);
 
-  // var time_extent = d3.extent(data, function (d) { return new Date(d.monthCommencing); });
-  // console.log(time_extent);
-  // Hardcoded to Jan for now, as was stopping on 1st Dec otherwise
+  // X SCALE TIME
+  var time_extent = d3.extent(data, function (d) { return new Date(d.monthCommencing); });
+  var startDate = time_extent[0];
+  var endDate = new Date(time_extent[1]);
+  endDate = new Date(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDay());
   var x_scale = d3.time.scale()
-    .domain([ new Date ('2014-01-01T00:00:00.000Z'), new Date ('2015-01-01T00:00:00.000Z') ])
+    .domain([startDate, endDate])
     .range([margin.left, margin.left + width]);
 
   // TOOL TIP
@@ -69,28 +116,26 @@ function draw(data) {
           "<span style='color:#FECB33;'>" + $.number(d.peopleNew) + "</span> New<br /><br />";
   });
 
-  d3.select("#chart").call(tip);
+  chart.call(tip);
 
-  // Re-usable hatch pattern -- .attr('fill', 'url(#diagonalHatchDollars)');
-  d3.select("#chart")
+  // Re-usable hatch pattern - Dollars (white)
+  // .attr('fill', 'url(#diagonalHatchDollars)');
+  chart
   .append('defs')
   .append('pattern')
     .attr('id', 'diagonalHatchDollars')
     .attr('patternUnits', 'userSpaceOnUse')
     .attr('width', 4)
     .attr('height', 2)
-  // .append('path')
-  //   .attr('d', 'M0 5L5 0ZM6 4L4 6ZM-1 1L1 -1Z')
-  //   .attr('stroke', '#AAA')
-  //   .attr('stroke-width', 1);
   .append('rect')
     .attr('fill', '#FFF')
     .attr('width', 4)
     .attr('height', 1)
     .attr('opacity', 0.5);
 
-  // Re-usable hatch pattern -- .attr('fill', 'url(#diagonalHatchPeople)');
-  d3.select("#chart")
+  // Re-usable hatch pattern - Contributors (orange)
+  // .attr('fill', 'url(#diagonalHatchPeople)');
+  chart
   .append('defs')
   .append('pattern')
     .attr('id', 'diagonalHatchPeople')
@@ -103,8 +148,10 @@ function draw(data) {
     .attr('height', 1)
     .attr('opacity', 0.5);
 
-  // REFERENCE LINES
-  d3.select("#chart")
+  /**
+   * REFERENCE LINES
+   */
+  chart
     .append("line")
     .attr("x1", margin.left)
     .attr("x2", margin.left + width)
@@ -112,7 +159,7 @@ function draw(data) {
     .attr("y2", y_scale(TARGET_25_percent))
     .attr("class", "target milestone");
 
-  d3.select("#chart")
+  chart
     .append("line")
     .attr("x1", margin.left)
     .attr("x2", margin.left + width)
@@ -120,7 +167,7 @@ function draw(data) {
     .attr("y2", y_scale(TARGET_50_percent))
     .attr("class", "target milestone");
 
-  d3.select("#chart")
+  chart
     .append("line")
     .attr("x1", margin.left)
     .attr("x2", margin.left + width)
@@ -128,30 +175,24 @@ function draw(data) {
     .attr("y2", y_scale(TARGET_75_percent))
     .attr("class", "target milestone");
 
-  d3.select("#chart")
+  chart
     .append("line")
     .attr("x1", margin.left)
     .attr("x2", margin.left + width)
     .attr("y1", y_scale(TARGET))
     .attr("y2", y_scale(TARGET))
-    .attr("class", "target milestone");
+    .attr("class", "target goal");
 
-  // ANNUAL TARGET
-  d3.select("#chart")
-    .append("line")
-    .attr("x1", margin.left)
-    .attr("x2", margin.left + width)
-    .attr("y1", y_scale(TARGET_2014))
-    .attr("y2", y_scale(TARGET_2014))
-    //.style("stroke-dasharray", ("1, 1"))
-    .attr("class", "target target2014 milestone");
-
-  // Bars
+  /**
+   * BARS
+   */
   var barWidth = width / data.length;
-  var halfBar = (barWidth / 2) - 1;
+  var halfBar = (barWidth / 2);
 
-  // HOVER BARS
-  d3.select("#chart")
+  /**
+   * HOVER INFO BARS
+   */
+  chart
     .selectAll("g")
     .data(data)
     .enter()
@@ -176,11 +217,13 @@ function draw(data) {
       });
 
   // Position these elements on the X axis using their date value
-  d3.select("#chart").selectAll(".info-area")
+  chart.selectAll(".info-area")
     .attr("x", function (d) { return x_scale(new Date(d.monthCommencing)); });
 
-  // NEW dollars
-  d3.select("#chart")
+  /**
+   * DOLLAR BARS
+   */
+  chart
     .selectAll("g")
     .data(data.filter(function (d) { return (d.dollarNew > 0); }))
     .enter()
@@ -198,11 +241,13 @@ function draw(data) {
       .attr('fill', 'url(#diagonalHatchDollars)');
 
   // Position these elements on the X axis using their date value
-  d3.select("#chart").selectAll(".new-dollars")
+  chart.selectAll(".new-dollars")
     .attr("x", function (d) { return x_scale(new Date(d.monthCommencing)); });
 
-  // NEW contributors
-  d3.select("#chart")
+  /**
+   * CONTRIBUTOR BARS
+   */
+  chart
     .selectAll("g")
     .data(data.filter(function (d) { return (d.peopleNew > 0); }))
     .enter()
@@ -216,21 +261,26 @@ function draw(data) {
       })
       .attr("y",          function (d) { return y_scale_2(d.peopleNew); })
       .attr("height",     function (d) { return height+margin.top - y_scale_2(d.peopleNew); })
-      .attr("width", halfBar - 1)
+      .attr("width", halfBar - 2)
       .attr('fill', 'url(#diagonalHatchPeople)');
 
   // Position these elements on the X axis using their date value
-  d3.select("#chart").selectAll(".new-contributors")
+  chart.selectAll(".new-contributors")
     .attr("x", function (d) { return x_scale(new Date(d.monthCommencing)) + halfBar; });
 
-  // Total dollars
-  // Line
+  /**
+   * LINES & POINTS
+   */
+
+  /**
+   * DOLLAR LINES
+   */
   var line = d3.svg.line()
     .x(function (d) { return x_scale(new Date(d.monthCommencing)) + halfBar; })
     .y(function (d) { return y_scale(d.dollarRunningTotal); });
 
   // line to date
-  d3.select("#chart")
+  chart
     .append("path")
     .datum(data.filter(function (d) {
         return (d.dollarRunningTotal > 0 && (new Date(d.monthCommencing) < now));
@@ -240,7 +290,7 @@ function draw(data) {
     .attr("d", line);
 
   // line future
-  d3.select("#chart")
+  chart
     .append("path")
     .datum(data.filter(function (d) {
         return (d.dollarRunningTotal > 0 && (new Date(d.monthCommencing) > lastMonth));
@@ -251,7 +301,7 @@ function draw(data) {
     .attr("d", line);
 
   // Points
-  d3.select("#chart")
+  chart
     .selectAll("points")
     .data(data.filter(function (d) { return (d.dollarRunningTotal > 0); }))
     .enter()
@@ -264,21 +314,22 @@ function draw(data) {
       }
     });
 
-  d3.select("#chart").selectAll(".total-dollars")
+  chart.selectAll(".total-dollars")
     .attr("cx", function (d) { return x_scale(new Date(d.monthCommencing)) + halfBar; })
     .attr("cy", function (d) { return y_scale(d.dollarRunningTotal); })
     .attr("r", function (d) {
       return 2.0;
     });
 
-  // Total Contributors
-  // Line
+  /**
+   * CONTIRIBUTOR LINES
+   */
   var line2 = d3.svg.line()
     .x(function (d) { return x_scale(new Date(d.monthCommencing)) + halfBar; })
     .y(function (d) { return y_scale_2(d.contributorRunningTotal); });
 
   // line to date
-  d3.select("#chart")
+  chart
     .append("path")
     .datum(data.filter(function (d) {
         return (d.contributorRunningTotal > 0 && (new Date(d.monthCommencing) < now));
@@ -288,7 +339,7 @@ function draw(data) {
     .attr("d", line2);
 
   // line future
-  d3.select("#chart")
+  chart
     .append("path")
     .datum(data.filter(function (d) {
         return (d.contributorRunningTotal > 0 && (new Date(d.monthCommencing) > lastMonth));
@@ -299,7 +350,7 @@ function draw(data) {
     .attr("d", line2);
 
   // Points
-  d3.select("#chart")
+  chart
     .selectAll("points")
     .data(data.filter(function (d) { return (d.contributorRunningTotal > 0); }))
     .enter()
@@ -312,17 +363,19 @@ function draw(data) {
       }
     });
 
-  d3.select("#chart").selectAll(".total-contributors")
+  chart.selectAll(".total-contributors")
     .attr("cx", function (d) { return x_scale(new Date(d.monthCommencing)) + halfBar; })
     .attr("cy", function (d) { return y_scale_2(d.contributorRunningTotal); })
     .attr("r", function (d) {
       return 2.0;
     });
 
-  // AXIS
+  /**
+   * AXIS
+   */
   var x_axis  = d3.svg.axis()
                 .scale(x_scale)
-                .ticks(d3.time.months, 1)
+                .ticks(d3.time.month, 1)
                 .tickFormat(function (d) {
                   var format_month = d3.time.format('%b'); // short name month e.g. Feb
                   var format_year = d3.time.format('%Y');
@@ -332,7 +385,7 @@ function draw(data) {
                   }
                   return label;
                 });
-  d3.select("#chart")
+  chart
   .append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(0," + (height + margin.top) + ")")
@@ -344,6 +397,7 @@ function draw(data) {
     .attr("transform", "rotate(270) translate(-35,0)")
     .style("text-anchor", "start");
 
+  // Y-AXIS LEFT (dollar scale)
   var y_axis = d3.svg.axis()
                 .scale(y_scale)
                 .orient("left")
@@ -352,38 +406,30 @@ function draw(data) {
                   var format_number = d3.format(["$", ""]);
                   return format_number(d);
                 });
-  d3.select("#chart")
+  chart
   .append("g")
     .attr("class", "y axis")
     .attr("transform", "translate(" + margin.left + ", 0 )")
   .call(y_axis);
 
+  // Y-AXIS RIGHT (contributor scale)
   var y_axis_2 = d3.svg.axis()
                 .scale(y_scale_2)
                 .orient("right");
-  d3.select("#chart")
+  chart
   .append("g")
     .attr("class", "y axis y2")
     .attr("transform", "translate(" + (width + margin.left) + ", 0 )")
   .call(y_axis_2);
+
+  resize_charts();
 }
 
 // Draw the D3 chart
-d3.json(GRAPH_DATA, draw);
+d3.json(GRAPH_DATA_2014, function (data) {
+  draw(data, '#chart1', 7000000);
+});
 
-// Make the chart responsive
-var chart = $("#chart"),
-    aspect = chart.width() / chart.height(),
-    container = chart.parent();
-
-function resize_chart () {
-  var targetWidth = container.width();
-  chart.attr("width", targetWidth);
-  chart.attr("height", Math.round(targetWidth / aspect));
-}
-
-$(window).on("resize", function() {
-    resize_chart();
-}).trigger("resize");
-
-
+d3.json(GRAPH_DATA_2015, function (data) {
+  draw(data, '#chart2', 7000000);
+});

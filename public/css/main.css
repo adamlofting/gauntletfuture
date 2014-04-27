@@ -186,11 +186,6 @@ line.target {
 line.target.goal {
     fill: none;
     stroke: #FFF;
-}
-
-line.target.target2014 {
-    fill: none;
-    stroke: #FFF;
     opacity: 1;
 }
 
