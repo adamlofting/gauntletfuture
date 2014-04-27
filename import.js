@@ -162,25 +162,25 @@ function processCSV(fetchecCSV) {
   var amountsToSave = [];
   var allPeopleToSave = [];
 
-  function addToAmounts(date, amount) {
+  function addToAmounts(date, amount, field) {
     amount = util.toInt(amount);
     if (util.isValidDate(date) && (amount > 0)) {
       var amountToSave = {
-        'yesdate': util.dateToISOtring(new Date(date)),
-        '2014dollar': amount
+        'yesdate': util.dateToISOtring(new Date(date))
       };
+      amountToSave[field] = amount;
       console.log(amountToSave);
       amountsToSave.push(amountToSave);
     }
   }
 
-  function addToPeople(date, count) {
+  function addToPeople(date, count, field) {
     count = util.toInt(count);
     if (util.isValidDate(date) && (count > 0)) {
       var peopleToSave = {
-        'yesdate': util.dateToISOtring(new Date(date)),
-        '2014people': count
+        'yesdate': util.dateToISOtring(new Date(date))
       };
+      peopleToSave[field] = count;
       console.log(peopleToSave);
       allPeopleToSave.push(peopleToSave);
     }
@@ -195,36 +195,55 @@ function processCSV(fetchecCSV) {
     .to.stream(process.stdout, {
       columns: ['closedyesdate',
         'closed2014dollar',
+        'closed2015dollar',
         'closed2014contributor',
+        'closed2015contributor',
         'prospectyesdate',
         'prospect2014predictiondollar',
+        'prospect2015predictiondollar',
         'prospectlikelihood',
         'prospect2014dollar',
-        'prospect2014predictioncontributor'
+        'prospect2014predictioncontributor',
+        'prospect2015predictioncontributor',
       ]
     })
     .transform(function (row) {
       //row.name = row.closedyesdate + ' ' + row.closed2014dollar;
-      console.log('\n\n=================');
+      console.log('\n\n-------------');
       console.log(' ');
       // Dollars
       if (row.closedyesdate && row.closed2014dollar) {
-        console.log("* Closed yes date and dollar");
-        addToAmounts(row.closedyesdate, row.closed2014dollar);
+        console.log("* Closed yes date and 2014 dollar");
+        addToAmounts(row.closedyesdate, row.closed2014dollar, '2014dollar');
+      }
+      if (row.closedyesdate && row.closed2015dollar) {
+        console.log("* Closed yes date and 2015 dollar");
+        addToAmounts(row.closedyesdate, row.closed2015dollar, '2015dollar');
       }
       if (row.prospectyesdate && row.prospect2014predictiondollar) {
-        console.log("* Prospect yes date and dollar");
-        console.log("TEST",row.prospect2014predictiondollar);
-        addToAmounts(row.prospectyesdate, row.prospect2014predictiondollar);
+        console.log("* Prospect yes date and 2014 dollar");
+        addToAmounts(row.prospectyesdate, row.prospect2014predictiondollar, '2014dollar');
+      }
+      if (row.prospectyesdate && row.prospect2015predictiondollar) {
+        console.log("* Prospect yes date and 2015 dollar");
+        addToAmounts(row.prospectyesdate, row.prospect2015predictiondollar, '2015dollar');
       }
       // Contributors
       if (row.closedyesdate && row.closed2014contributor) {
-        console.log("* Closed yes date and contributor");
-        addToPeople(row.closedyesdate, row.closed2014contributor);
+        console.log("* Closed yes date and 2014 contributor");
+        addToPeople(row.closedyesdate, row.closed2014contributor, '2014people');
+      }
+      if (row.closedyesdate && row.closed2015contributor) {
+        console.log("* Closed yes date and 2015 contributor");
+        addToPeople(row.closedyesdate, row.closed2015contributor, '2015people');
       }
       if (row.prospectyesdate && row.prospect2014predictioncontributor) {
-        console.log("* Prospect yes date and contributor");
-        addToPeople(row.prospectyesdate, row.prospect2014predictioncontributor);
+        console.log("* Prospect yes date and 2014 contributor");
+        addToPeople(row.prospectyesdate, row.prospect2014predictioncontributor, '2014people');
+      }
+      if (row.prospectyesdate && row.prospect2015predictioncontributor) {
+        console.log("* Prospect yes date and 2015 contributor");
+        addToPeople(row.prospectyesdate, row.prospect2015predictioncontributor, '2015people');
       }
       console.log(' ');
       console.log('Raw row:');
