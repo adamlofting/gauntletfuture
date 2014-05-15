@@ -27,6 +27,12 @@ $(window).on("resize", function() {
     resize_charts();
 }).trigger("resize");
 
+// For X Axis ordinal scale
+var MONTH_NAMES = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+function dateStringToMonthName(str) {
+  var date = new Date(str);
+  return MONTH_NAMES[date.getMonth()];
+}
 
 /**
  *
@@ -94,12 +100,11 @@ function draw(data, targetSelector, targetLine, year) {
     .range([height + margin.top, margin.top])
     .domain([0,y_scale_2_max]);
 
-  // X SCALE TIME
-  var startDate = new Date(year, 0, 1);
-  var endDate = new Date(year , 11, 31);
-  var x_scale = d3.time.scale()
-    .domain([startDate, endDate])
-    .range([margin.left, margin.left + width]);
+  // X SCALE ORDINAL
+  var x_scale = d3.scale.ordinal()
+    .domain(MONTH_NAMES)
+    .rangeBands([margin.left, margin.left + width])
+    ;
 
   // TOOL TIP
   var tip = d3.tip()
@@ -184,7 +189,7 @@ function draw(data, targetSelector, targetLine, year) {
   /**
    * BARS
    */
-  var barWidth = (width / data.length) -10;
+  var barWidth = (width / data.length);
   var halfBar = (barWidth / 2);
 
   /**
@@ -204,7 +209,7 @@ function draw(data, targetSelector, targetLine, year) {
       })
       .attr("y",          function (d) { return margin.top; })
       .attr("height",     function (d) { return height; })
-      .attr("width", barWidth - 1)
+      .attr("width", barWidth )
       .on("mouseover", function(d, i) {
         d3.select(this).style("opacity", 0.1);
         tip.show(d);
@@ -216,7 +221,9 @@ function draw(data, targetSelector, targetLine, year) {
 
   // Position these elements on the X axis using their date value
   chart.selectAll(".info-area")
-    .attr("x", function (d) { return x_scale(new Date(d.monthCommencing)); });
+    .attr("x", function (d) { return x_scale(
+        dateStringToMonthName(d.monthCommencing)
+      ); });
 
   /**
    * DOLLAR BARS
@@ -235,12 +242,14 @@ function draw(data, targetSelector, targetLine, year) {
       })
       .attr("y",          function (d) { return y_scale(d.dollarNew); })
       .attr("height",     function (d) { return height+margin.top - y_scale(d.dollarNew); })
-      .attr("width", halfBar - 1)
+      .attr("width", halfBar)
       .attr('fill', 'url(#diagonalHatchDollars)');
 
   // Position these elements on the X axis using their date value
   chart.selectAll(".new-dollars")
-    .attr("x", function (d) { return x_scale(new Date(d.monthCommencing)); });
+    .attr("x", function (d) { return x_scale(
+        dateStringToMonthName(d.monthCommencing)
+      ); });
 
   /**
    * CONTRIBUTOR BARS
@@ -259,12 +268,15 @@ function draw(data, targetSelector, targetLine, year) {
       })
       .attr("y",          function (d) { return y_scale_2(d.peopleNew); })
       .attr("height",     function (d) { return height+margin.top - y_scale_2(d.peopleNew); })
-      .attr("width", halfBar - 2)
+      .attr("width", halfBar)
       .attr('fill', 'url(#diagonalHatchPeople)');
 
   // Position these elements on the X axis using their date value
   chart.selectAll(".new-contributors")
-    .attr("x", function (d) { return x_scale(new Date(d.monthCommencing)) + halfBar; });
+    .attr("x", function (d) { return x_scale(
+        //new Date(d.monthCommencing)
+        dateStringToMonthName(d.monthCommencing)
+      ) + halfBar; });
 
   /**
    * LINES & POINTS
@@ -274,7 +286,9 @@ function draw(data, targetSelector, targetLine, year) {
    * DOLLAR LINES
    */
   var line = d3.svg.line()
-    .x(function (d) { return x_scale(new Date(d.monthCommencing)) + halfBar; })
+    .x(function (d) { return x_scale(
+        dateStringToMonthName(d.monthCommencing)
+      ) + halfBar; })
     .y(function (d) { return y_scale(d.dollarRunningTotal); });
 
   // line to date
@@ -313,7 +327,9 @@ function draw(data, targetSelector, targetLine, year) {
     });
 
   chart.selectAll(".total-dollars")
-    .attr("cx", function (d) { return x_scale(new Date(d.monthCommencing)) + halfBar; })
+    .attr("cx", function (d) { return x_scale(
+        dateStringToMonthName(d.monthCommencing)
+      ) + halfBar; })
     .attr("cy", function (d) { return y_scale(d.dollarRunningTotal); })
     .attr("r", function (d) {
       return 2.0;
@@ -323,7 +339,9 @@ function draw(data, targetSelector, targetLine, year) {
    * CONTIRIBUTOR LINES
    */
   var line2 = d3.svg.line()
-    .x(function (d) { return x_scale(new Date(d.monthCommencing)) + halfBar; })
+    .x(function (d) { return x_scale(
+        dateStringToMonthName(d.monthCommencing)
+      ) + halfBar; })
     .y(function (d) { return y_scale_2(d.contributorRunningTotal); });
 
   // line to date
@@ -362,7 +380,9 @@ function draw(data, targetSelector, targetLine, year) {
     });
 
   chart.selectAll(".total-contributors")
-    .attr("cx", function (d) { return x_scale(new Date(d.monthCommencing)) + halfBar; })
+    .attr("cx", function (d) { return x_scale(
+        dateStringToMonthName(d.monthCommencing)
+      ) + halfBar; })
     .attr("cy", function (d) { return y_scale_2(d.contributorRunningTotal); })
     .attr("r", function (d) {
       return 2.0;
@@ -372,17 +392,8 @@ function draw(data, targetSelector, targetLine, year) {
    * AXIS
    */
   var x_axis  = d3.svg.axis()
-                .scale(x_scale)
-                .ticks(d3.time.month, 1)
-                .tickFormat(function (d) {
-                  var format_month = d3.time.format('%b'); // short name month e.g. Feb
-                  var format_year = d3.time.format('%Y');
-                  var label = format_month(d);//.toUpperCase();
-                  if (label === "Jan") {
-                    label = format_year(d);
-                  }
-                  return label;
-                });
+                .scale(x_scale);
+
   chart
   .append("g")
     .attr("class", "x axis")
@@ -392,7 +403,7 @@ function draw(data, targetSelector, targetLine, year) {
     .attr("y", 0)
     .attr("x", 0)
     .attr("dy", ".35em")
-    .attr("transform", "rotate(270) translate(-35,"+(halfBar-2)+")")
+    .attr("transform", "rotate(0) translate(-13,20)")
     .style("text-anchor", "start");
 
   // Y-AXIS LEFT (dollar scale)

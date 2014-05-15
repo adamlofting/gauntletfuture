@@ -145,7 +145,7 @@ svg {
 }
 
 .tick line {
-  display: none;
+  /*display: none;*/
 }
 
 .y2 .tick text {
