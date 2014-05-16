@@ -192,9 +192,6 @@ rect.bar-2.past-date {
   fill: rgba(254, 203, 51, 1);
 }
 
-rect.bar-2.future-date {
-  /*fill: rgba(254, 203, 51, 0.5);*/
-}
 
 line.target {
     fill: none;

@@ -203,11 +203,11 @@ function draw(data, targetSelector, targetLine, year) {
   chart.call(tip);
 
   // Re-usable hatch pattern - Dollars (white)
-  // .attr('fill', 'url(#diagonalHatchDollars)');
+  // .attr('fill', 'url(#patternHatchDollars)');
   chart
   .append('defs')
   .append('pattern')
-    .attr('id', 'diagonalHatchDollars')
+    .attr('id', 'patternHatchDollars')
     .attr('patternUnits', 'userSpaceOnUse')
     .attr('width', 4)
     .attr('height', 2)
@@ -218,11 +218,11 @@ function draw(data, targetSelector, targetLine, year) {
     .attr('opacity', 0.5);
 
   // Re-usable hatch pattern - Contributors (orange)
-  // .attr('fill', 'url(#diagonalHatchPeople)');
+  // .attr('fill', 'url(#patternHatchPeople)');
   chart
   .append('defs')
   .append('pattern')
-    .attr('id', 'diagonalHatchPeople')
+    .attr('id', 'patternHatchPeople')
     .attr('patternUnits', 'userSpaceOnUse')
     .attr('width', 4)
     .attr('height', 2)
@@ -235,10 +235,10 @@ function draw(data, targetSelector, targetLine, year) {
   /**
    * REFERENCE LINES
    */
-  drawAReferenceLine (y_scale, TARGET_25_percent, 'milestone');
-  drawAReferenceLine (y_scale, TARGET_50_percent, 'milestone');
-  drawAReferenceLine (y_scale, TARGET_75_percent, 'milestone');
-  drawAReferenceLine (y_scale, TARGET, 'goal');
+  drawAReferenceLine(y_scale, TARGET_25_percent, 'milestone');
+  drawAReferenceLine(y_scale, TARGET_50_percent, 'milestone');
+  drawAReferenceLine(y_scale, TARGET_75_percent, 'milestone');
+  drawAReferenceLine(y_scale, TARGET, 'goal');
 
   /**
    * BARS
@@ -281,68 +281,56 @@ function draw(data, targetSelector, targetLine, year) {
       ); });
 
   /**
-   * DOLLAR BARS
+   * Draw bars
    */
-  chart
-    .selectAll("g")
-    .data(data.filter(function (d) { return (d.dollarNew > 0); }))
-    .enter()
-    .append("rect")
-      .attr("class", function (d) {
-        if (new Date(d.monthCommencing) > now) {
-          return "bar-1 future-date";
-        } else {
-          return "bar-1 past-date";
-        }
-      })
-      .attr("y",          function (d) { return y_scale(d.dollarNew); })
-      .attr("height",     function (d) { return height+margin.top - y_scale(d.dollarNew); })
-      .attr("width", partMonth)
-      .attr('fill', 'url(#diagonalHatchDollars)');
+  function drawBars(position, year, fieldName, pattern, scale_to_use) {
+    var cssClass = "bar-" + position;
+    var multiplier = position - 1;
 
-  // Position these elements on the X axis using their date value
-  chart.selectAll(".bar-1")
-    .attr("x", function (d) { return x_scale(
-        dateStringToMonthName(d.monthCommencing)
-      ); });
+    chart
+      .selectAll("g")
+      .data(data.filter(function (d) {
+          var date = new Date(d.monthCommencing);
+          return ((d[fieldName] > 0) &&
+                  (date.getUTCFullYear() === year) // filter to relevant year
+                  );
+        }))
+      .enter()
+      .append("rect")
+        .attr("class", function (d) {
+          if (new Date(d.monthCommencing) > now) {
+            return cssClass + " future-date";
+          } else {
+            return cssClass + " past-date";
+          }
+        })
+        .attr("y",          function (d) { return scale_to_use(d[fieldName]); })
+        .attr("height",     function (d) { return height+margin.top - scale_to_use(d[fieldName]); })
+        .attr("width", partMonth)
+        .attr('fill', 'url(#' + pattern + ')');
+
+    // Position these elements on the X axis using their date value
+    chart.selectAll("." + cssClass)
+      .attr("x", function (d) {
+          return x_scale(dateStringToMonthName(d.monthCommencing)) + (multiplier * partMonth);
+        });
+  }
+
 
   /**
-   * CONTRIBUTOR BARS
+   * NEW - BARS
    */
-  chart
-    .selectAll("g")
-    .data(data.filter(function (d) { return (d.peopleNew > 0); }))
-    .enter()
-    .append("rect")
-      .attr("class", function (d) {
-        if (new Date(d.monthCommencing) > now) {
-          return "bar-2 future-date";
-        } else {
-          return "bar-2 past-date";
-        }
-      })
-      .attr("y",          function (d) { return y_scale_2(d.peopleNew); })
-      .attr("height",     function (d) { return height+margin.top - y_scale_2(d.peopleNew); })
-      .attr("width", partMonth)
-      .attr('fill', 'url(#diagonalHatchPeople)');
+  drawBars(1, 2014, 'dollarNew', 'patternHatchDollars', y_scale);
+  drawBars(2, 2014, 'peopleNew', 'patternHatchPeople', y_scale_2);
+  drawBars(3, 2015, 'dollarNew', 'patternHatchDollars', y_scale);
 
-  // Position these elements on the X axis using their date value
-  chart.selectAll(".bar-2")
-    .attr("x", function (d) { return x_scale(
-        //new Date(d.monthCommencing)
-        dateStringToMonthName(d.monthCommencing)
-      ) + partMonth; });
 
   /**
-   * LINES & POINTS
+   * RUNNING TOTALS - LINES
    */
-
-  /**
-   * RUNNING TOTALS
-   */
-    drawALine(1, "dollarRunningTotal", y_scale, 2014);
-    drawALine(1, "dollarRunningTotal", y_scale, 2015);
-    drawALine(2, "peopleRunningTotal", y_scale_2, 2014);
+  drawALine(1, "dollarRunningTotal", y_scale, 2014);
+  drawALine(1, "dollarRunningTotal", y_scale, 2015);
+  drawALine(2, "peopleRunningTotal", y_scale_2, 2014);
 
 
   /**
