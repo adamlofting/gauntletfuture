@@ -157,42 +157,42 @@ circle {
   fill: #fff;
 }
 
-circle.total-contributors {
+circle.line-2 {
   stroke: none;
   fill: rgba(254, 203, 51, 1);
 }
 
-circle.total-contributors.future-date {
+circle.line-2.future-date {
   stroke: none;
   fill: rgba(254, 203, 51, 1);
 }
 
-.line.total-dollars {
+.line.line-1 {
   fill: none;
   stroke: #fff;
   stroke-width: 1.5px;
 }
 
-.line.total-contributors {
+.line.line-2 {
   fill: none;
   stroke: rgba(254, 203, 51, 1);
   stroke-width: 1.5px;
 }
 
-.line.total-contributors.future-date {
+.line.line-2.future-date {
   stroke: rgba(254, 203, 51, 0.5);
 }
 
 
-rect.new-dollars.past-date {
+rect.bar-1.past-date {
   fill: #fff;
 }
 
-rect.new-contributors.past-date {
+rect.bar-2.past-date {
   fill: rgba(254, 203, 51, 1);
 }
 
-rect.new-contributors.future-date {
+rect.bar-2.future-date {
   /*fill: rgba(254, 203, 51, 0.5);*/
 }
 
@@ -217,12 +217,12 @@ rect.future-date {
 
 }
 
-.line.total-dollars.future-date {
+.line.line-1.future-date {
   fill:none;
   stroke: rgba(255, 255, 255, 0.5);
 }
 
-.line.total-contributors.future-date {
+.line.line-2.future-date {
   fill:none;
   stroke: rgba(255, 255, 0, 0.5);
 }

@@ -1,5 +1,6 @@
 var GRAPH_DATA_2014 = "/api/2014";
 var GRAPH_DATA_2015 = "/api/2015";
+var GRAPH_DATA_ALL = "/api/all";
 
 /**
  * RESPONSIVE
@@ -13,6 +14,10 @@ var chart2 = $("#chart2"),
     aspect2 = chart2.width() / chart2.height(),
     container2 = chart2.parent();
 
+var chartAll = $("#chartAll"),
+    aspectAll = chartAll.width() / chartAll.height(),
+    containerAll = chartAll.parent();
+
 function resize_charts () {
   var targetWidth1 = container1.width();
   chart1.attr("width", targetWidth1);
@@ -21,6 +26,10 @@ function resize_charts () {
   var targetWidth2 = container2.width();
   chart2.attr("width", targetWidth2);
   chart2.attr("height", Math.round(targetWidth2 / aspect2));
+
+  var targetWidthAll = containerAll.width();
+  chartAll.attr("width", targetWidthAll);
+  chartAll.attr("height", Math.round(targetWidthAll / aspectAll));
 }
 
 $(window).on("resize", function() {
@@ -34,14 +43,16 @@ function dateStringToMonthName(str) {
   return MONTH_NAMES[date.getMonth()];
 }
 
+
 /**
  *
  * DRAW A GRAPH
  *
  */
 function draw(data, targetSelector, targetLine, year) {
-  var chart = d3.select(targetSelector);
+  var NUMBER_OF_THINGS = 3;
   var TARGET = targetLine;
+  var chart = d3.select(targetSelector);
 
   // utitlity vars
   var now = new Date();
@@ -75,6 +86,81 @@ function draw(data, targetSelector, targetLine, year) {
     .attr("viewBox", VIEWBOX); // this is used for SVG proportional resizing
 
   /**
+   * FUNCTIONS
+   */
+
+  /**
+   * Draw a line
+   */
+  function drawALine (lineNumber, fieldName, scale_to_use, year) {
+    var cssClass = "line-" + lineNumber;
+
+    // map the line
+    var line = d3.svg.line()
+      .x(function (d) { return x_scale(
+          dateStringToMonthName(d.monthCommencing)
+        ) + halfMonth; })
+      .y(function (d) { return scale_to_use(d[fieldName]); });
+
+    // TO-DATE: show segment of the full line
+    chart
+      .append("path")
+      .datum(data.filter(function (d) {
+          var date = new Date(d.monthCommencing);
+          return ((d[fieldName] > 0) &&
+                  (date < now) &&
+                  (date.getUTCFullYear() === year) // filter on year
+                  );
+        })
+      )
+      .attr("class", "line " + cssClass)
+      .attr("d", line);
+
+    // FUTURE: show segment of the full line
+    chart
+      .append("path")
+      .datum(data.filter(function (d) {
+          var date = new Date(d.monthCommencing);
+          return ((d[fieldName] > 0) &&
+                  (date > lastMonth) &&
+                  (date.getUTCFullYear() === year) // filter on year
+                  );
+        })
+      )
+      .attr("class", "line future-date " + cssClass)
+      .style("stroke-dasharray", ("2, 2"))
+      .attr("d", line);
+
+    // Points
+    chart
+      .selectAll("points")
+      .data(data.filter(function (d) {
+          var date = new Date(d.monthCommencing);
+          return ((d[fieldName] > 0) &&
+                  (date.getUTCFullYear() === year)
+                  );
+        }))
+      .enter()
+      .append("circle")
+      .attr("class", function (d) {
+        if (new Date(d.monthCommencing) > now) {
+          return cssClass + " future-date";
+        } else {
+          return cssClass;
+        }
+      });
+
+    chart.selectAll("." + cssClass)
+      .attr("cx", function (d) { return x_scale(
+          dateStringToMonthName(d.monthCommencing)
+        ) + halfMonth; })
+      .attr("cy", function (d) { return scale_to_use(d[fieldName]); })
+      .attr("r", function (d) {
+        return 2.0;
+      });
+  }
+
+  /**
    * SCALES
    */
 
@@ -91,7 +177,7 @@ function draw(data, targetSelector, targetLine, year) {
 
   // Y SCALE RIGHT (Contributors)
   var y_scale_2_max = Y_SCALE_2_MAX_DEFAULT;
-  var extent_contributors = d3.extent(data, function (d) { return d.contributorRunningTotal; });
+  var extent_contributors = d3.extent(data, function (d) { return d.peopleRunningTotal; });
   if (extent_contributors[1] > y_scale_2_max) {
     y_scale_2_max = extent_contributors[1];
   }
@@ -103,7 +189,7 @@ function draw(data, targetSelector, targetLine, year) {
   // X SCALE ORDINAL
   var x_scale = d3.scale.ordinal()
     .domain(MONTH_NAMES)
-    .rangeBands([margin.left, margin.left + width])
+    .rangeBands([margin.left, margin.left + width],0.1,0.1)
     ;
 
   // TOOL TIP
@@ -115,7 +201,7 @@ function draw(data, targetSelector, targetLine, year) {
           "<span style='color:#FFF;'>$" + $.number(d.dollarRunningTotal) + "</span> Total<br />" +
           "<span style='color:#FFF;'>$" + $.number(d.dollarNew) + "</span> New<br /><br />" +
           "Potential Contributors:<br/>" +
-          "<span style='color:#FECB33;'>" + $.number(d.contributorRunningTotal) + "</span> Total<br />" +
+          "<span style='color:#FECB33;'>" + $.number(d.peopleRunningTotal) + "</span> Total<br />" +
           "<span style='color:#FECB33;'>" + $.number(d.peopleNew) + "</span> New<br /><br />";
   });
 
@@ -189,8 +275,9 @@ function draw(data, targetSelector, targetLine, year) {
   /**
    * BARS
    */
-  var barWidth = (width / data.length);
-  var halfBar = (barWidth / 2);
+  var monthWidth = x_scale.rangeBand();
+  var partMonth = (monthWidth / NUMBER_OF_THINGS);
+  var halfMonth = (monthWidth / 2);
 
   /**
    * HOVER INFO BARS
@@ -209,7 +296,7 @@ function draw(data, targetSelector, targetLine, year) {
       })
       .attr("y",          function (d) { return margin.top; })
       .attr("height",     function (d) { return height; })
-      .attr("width", barWidth )
+      .attr("width", monthWidth )
       .on("mouseover", function(d, i) {
         d3.select(this).style("opacity", 0.1);
         tip.show(d);
@@ -235,18 +322,18 @@ function draw(data, targetSelector, targetLine, year) {
     .append("rect")
       .attr("class", function (d) {
         if (new Date(d.monthCommencing) > now) {
-          return "new-dollars future-date";
+          return "bar-1 future-date";
         } else {
-          return "new-dollars past-date";
+          return "bar-1 past-date";
         }
       })
       .attr("y",          function (d) { return y_scale(d.dollarNew); })
       .attr("height",     function (d) { return height+margin.top - y_scale(d.dollarNew); })
-      .attr("width", halfBar)
+      .attr("width", partMonth)
       .attr('fill', 'url(#diagonalHatchDollars)');
 
   // Position these elements on the X axis using their date value
-  chart.selectAll(".new-dollars")
+  chart.selectAll(".bar-1")
     .attr("x", function (d) { return x_scale(
         dateStringToMonthName(d.monthCommencing)
       ); });
@@ -261,132 +348,34 @@ function draw(data, targetSelector, targetLine, year) {
     .append("rect")
       .attr("class", function (d) {
         if (new Date(d.monthCommencing) > now) {
-          return "new-contributors future-date";
+          return "bar-2 future-date";
         } else {
-          return "new-contributors past-date";
+          return "bar-2 past-date";
         }
       })
       .attr("y",          function (d) { return y_scale_2(d.peopleNew); })
       .attr("height",     function (d) { return height+margin.top - y_scale_2(d.peopleNew); })
-      .attr("width", halfBar)
+      .attr("width", partMonth)
       .attr('fill', 'url(#diagonalHatchPeople)');
 
   // Position these elements on the X axis using their date value
-  chart.selectAll(".new-contributors")
+  chart.selectAll(".bar-2")
     .attr("x", function (d) { return x_scale(
         //new Date(d.monthCommencing)
         dateStringToMonthName(d.monthCommencing)
-      ) + halfBar; });
+      ) + partMonth; });
 
   /**
    * LINES & POINTS
    */
 
   /**
-   * DOLLAR LINES
+   * RUNNING TOTALS
    */
-  var line = d3.svg.line()
-    .x(function (d) { return x_scale(
-        dateStringToMonthName(d.monthCommencing)
-      ) + halfBar; })
-    .y(function (d) { return y_scale(d.dollarRunningTotal); });
+    drawALine(1, "dollarRunningTotal", y_scale, 2014);
+    drawALine(1, "dollarRunningTotal", y_scale, 2015);
+    drawALine(2, "peopleRunningTotal", y_scale_2, 2014);
 
-  // line to date
-  chart
-    .append("path")
-    .datum(data.filter(function (d) {
-        return (d.dollarRunningTotal > 0 && (new Date(d.monthCommencing) < now));
-      })
-    )
-    .attr("class", "line total-dollars ")
-    .attr("d", line);
-
-  // line future
-  chart
-    .append("path")
-    .datum(data.filter(function (d) {
-        return (d.dollarRunningTotal > 0 && (new Date(d.monthCommencing) > lastMonth));
-      })
-    )
-    .attr("class", "line total-dollars future-date")
-    .style("stroke-dasharray", ("2, 2"))
-    .attr("d", line);
-
-  // Points
-  chart
-    .selectAll("points")
-    .data(data.filter(function (d) { return (d.dollarRunningTotal > 0); }))
-    .enter()
-    .append("circle")
-    .attr("class", function (d) {
-      if (new Date(d.monthCommencing) > now) {
-        return "total-dollars future-date";
-      } else {
-        return "total-dollars";
-      }
-    });
-
-  chart.selectAll(".total-dollars")
-    .attr("cx", function (d) { return x_scale(
-        dateStringToMonthName(d.monthCommencing)
-      ) + halfBar; })
-    .attr("cy", function (d) { return y_scale(d.dollarRunningTotal); })
-    .attr("r", function (d) {
-      return 2.0;
-    });
-
-  /**
-   * CONTIRIBUTOR LINES
-   */
-  var line2 = d3.svg.line()
-    .x(function (d) { return x_scale(
-        dateStringToMonthName(d.monthCommencing)
-      ) + halfBar; })
-    .y(function (d) { return y_scale_2(d.contributorRunningTotal); });
-
-  // line to date
-  chart
-    .append("path")
-    .datum(data.filter(function (d) {
-        return (d.contributorRunningTotal > 0 && (new Date(d.monthCommencing) < now));
-      })
-    )
-    .attr("class", "line total-contributors ")
-    .attr("d", line2);
-
-  // line future
-  chart
-    .append("path")
-    .datum(data.filter(function (d) {
-        return (d.contributorRunningTotal > 0 && (new Date(d.monthCommencing) > lastMonth));
-      })
-    )
-    .attr("class", "line total-contributors future-date")
-    .style("stroke-dasharray", ("2, 2"))
-    .attr("d", line2);
-
-  // Points
-  chart
-    .selectAll("points")
-    .data(data.filter(function (d) { return (d.contributorRunningTotal > 0); }))
-    .enter()
-    .append("circle")
-    .attr("class", function (d) {
-      if (new Date(d.monthCommencing) > now) {
-        return "total-contributors future-date";
-      } else {
-        return "total-contributors";
-      }
-    });
-
-  chart.selectAll(".total-contributors")
-    .attr("cx", function (d) { return x_scale(
-        dateStringToMonthName(d.monthCommencing)
-      ) + halfBar; })
-    .attr("cy", function (d) { return y_scale_2(d.contributorRunningTotal); })
-    .attr("r", function (d) {
-      return 2.0;
-    });
 
   /**
    * AXIS
@@ -441,4 +430,8 @@ d3.json(GRAPH_DATA_2014, function (data) {
 
 d3.json(GRAPH_DATA_2015, function (data) {
   draw(data, '#chart2', 7000000, 2015);
+});
+
+d3.json(GRAPH_DATA_ALL, function (data) {
+  draw(data, '#chartAll', 7000000, 2015);
 });
