@@ -143,6 +143,19 @@ function draw(data, targetSelector, targetLine, year) {
   }
 
   /**
+   * Draw a reference line
+   */
+  function drawAReferenceLine (scale_to_use, value, cssClass) {
+    chart
+    .append("line")
+    .attr("x1", margin.left)
+    .attr("x2", margin.left + width)
+    .attr("y1", scale_to_use(value))
+    .attr("y2", scale_to_use(value))
+    .attr("class", "target " + cssClass);
+  }
+
+  /**
    * SCALES
    */
 
@@ -222,37 +235,10 @@ function draw(data, targetSelector, targetLine, year) {
   /**
    * REFERENCE LINES
    */
-  chart
-    .append("line")
-    .attr("x1", margin.left)
-    .attr("x2", margin.left + width)
-    .attr("y1", y_scale(TARGET_25_percent))
-    .attr("y2", y_scale(TARGET_25_percent))
-    .attr("class", "target milestone");
-
-  chart
-    .append("line")
-    .attr("x1", margin.left)
-    .attr("x2", margin.left + width)
-    .attr("y1", y_scale(TARGET_50_percent))
-    .attr("y2", y_scale(TARGET_50_percent))
-    .attr("class", "target milestone");
-
-  chart
-    .append("line")
-    .attr("x1", margin.left)
-    .attr("x2", margin.left + width)
-    .attr("y1", y_scale(TARGET_75_percent))
-    .attr("y2", y_scale(TARGET_75_percent))
-    .attr("class", "target milestone");
-
-  chart
-    .append("line")
-    .attr("x1", margin.left)
-    .attr("x2", margin.left + width)
-    .attr("y1", y_scale(TARGET))
-    .attr("y2", y_scale(TARGET))
-    .attr("class", "target goal");
+  drawAReferenceLine (y_scale, TARGET_25_percent, 'milestone');
+  drawAReferenceLine (y_scale, TARGET_50_percent, 'milestone');
+  drawAReferenceLine (y_scale, TARGET_75_percent, 'milestone');
+  drawAReferenceLine (y_scale, TARGET, 'goal');
 
   /**
    * BARS
