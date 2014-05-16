@@ -207,9 +207,9 @@ function draw(data, targetSelector) {
     return "Grants:<br/>" +
           "<span style='color:#FFF;'>$" + $.number(d.dollarRunningTotal) + "</span> Total<br />" +
           "<span style='color:#FFF;'>$" + $.number(d.dollarNew) + "</span> New<br /><br />" +
-          "Potential Accounts:<br/>" +
-          "<span style='color:#FECB33;'>" + $.number(d.peopleRunningTotal) + "</span> Total<br />" +
-          "<span style='color:#FECB33;'>" + $.number(d.peopleNew) + "</span> New<br /><br />";
+          "Potential Webmaker Accounts:<br/>" +
+          "<span style='color:"+color_3+";'>" + $.number(d.peopleRunningTotal) + "</span> Total<br />" +
+          "<span style='color:"+color_3+";'>" + $.number(d.peopleNew) + "</span> New<br /><br />";
   });
 
   chart.call(tip);
@@ -224,11 +224,11 @@ function draw(data, targetSelector) {
       .attr('id', name)
       .attr('patternUnits', 'userSpaceOnUse')
       .attr('width', 4)
-      .attr('height', 3)
+      .attr('height', 1)
     .append('rect')
       .attr('fill', color)
       .attr('width', 4)
-      .attr('height', 2.5)
+      .attr('height', 1)
       .attr('opacity', 0.5);
   }
 
@@ -258,15 +258,12 @@ function draw(data, targetSelector) {
     .data(data)
     .enter()
     .append("rect")
-      .attr("class", function (d) {
-        if (new Date(d.monthCommencing) > now) {
-          return "info-area future-date";
-        } else {
-          return "info-area";
-        }
-      })
-      .attr("y",          function (d) { return margin.top; })
-      .attr("height",     function (d) { return height; })
+      .attr("class", "info-area")
+      .attr("y", function (d) { return margin.top; })
+      .attr("x", function (d) {
+          return x_scale(dateStringToMonthName(d.monthCommencing));
+        })
+      .attr("height", function (d) { return height; })
       .attr("width", monthWidth )
       .on("mouseover", function(d, i) {
         d3.select(this).style("opacity", 0.1);
@@ -277,11 +274,6 @@ function draw(data, targetSelector) {
         tip.hide(d);
       });
 
-  // Position these elements on the X axis using their date value
-  chart.selectAll(".info-area")
-    .attr("x", function (d) { return x_scale(
-        dateStringToMonthName(d.monthCommencing)
-      ); });
 
   /**
    * Draw bars
@@ -393,7 +385,7 @@ function draw(data, targetSelector) {
     .attr("x", 0)
     .attr("y", 0)
     .attr("transform", "rotate(270) translate(-" + (height/2) + "," + (width + margin.left + (margin.right/4*3)) + ")")
-    .text("Predicted New Webmaker Accounts");
+    .text("Predicted New Webmaker User Accounts");
 
   resize_charts();
 }
