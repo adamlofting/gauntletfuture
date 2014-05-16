@@ -31,9 +31,12 @@ function dateStringToMonthName(str) {
  * DRAW A GRAPH
  *
  */
-function draw(data, targetSelector, targetLine, year) {
+function draw(data, targetSelector) {
   var NUMBER_OF_THINGS = 3;
-  var TARGET = targetLine;
+  var TARGET_1 = 7000000;
+  var TARGET_2 = 7500000;
+  var TARGET_3 = 150000;
+
   var chart = d3.select(targetSelector);
 
   // utitlity vars
@@ -47,13 +50,13 @@ function draw(data, targetSelector, targetLine, year) {
   var color_3 = "#b2df8a";
 
   // Graph settings
-  var Y_SCALE_2_MAX_DEFAULT = 10000;
-  var Y_SCALE_MAX_DEFAULT = TARGET * 1.25;
-  var TARGET_25_percent = Math.round(TARGET * 0.25),
-      TARGET_50_percent = Math.round(TARGET * 0.5),
-      TARGET_75_percent = Math.round(TARGET * 0.75);
+  var Y_SCALE_2_MAX_DEFAULT = TARGET_3 * 1.25;
+  var Y_SCALE_MAX_DEFAULT = TARGET_1 * 1.25;
+  var TARGET_25_percent = Math.round(TARGET_1 * 0.25),
+      TARGET_50_percent = Math.round(TARGET_1 * 0.5),
+      TARGET_75_percent = Math.round(TARGET_1 * 0.75);
 
-  var margin = {top: 20, right: 80, bottom: 45, left: 80};
+  var margin = {top: 20, right: 140, bottom: 45, left: 140};
       margin.vertical = margin.top + margin.bottom;
       margin.horizontal = margin.left + margin.right;
 
@@ -62,7 +65,7 @@ function draw(data, targetSelector, targetLine, year) {
 
   var VIEWBOX = "0 0 " + (width + margin.horizontal) + " " + (height + margin.vertical);
 
-  var TICK_VALUES = [TARGET_25_percent, TARGET_50_percent, TARGET_75_percent, TARGET, Y_SCALE_MAX_DEFAULT];
+  var TICK_VALUES = [TARGET_25_percent, TARGET_50_percent, TARGET_75_percent, TARGET_1, Y_SCALE_MAX_DEFAULT];
 
   /**
    * CONTATINER
@@ -79,7 +82,7 @@ function draw(data, targetSelector, targetLine, year) {
   /**
    * Draw a line
    */
-  function drawALine (lineNumber, fieldName, scale_to_use, year) {
+  function drawALine (lineNumber, fieldName, scale_to_use, year, icon) {
     var cssClass = "line-" + lineNumber;
 
     // map the line
@@ -128,33 +131,37 @@ function draw(data, targetSelector, targetLine, year) {
                   );
         }))
       .enter()
-      .append("circle")
-      .attr("class", function (d) {
-        if (new Date(d.monthCommencing) > now) {
-          return cssClass + " future-date";
-        } else {
-          return cssClass;
-        }
-      });
-
-    chart.selectAll("." + cssClass)
-      .attr("cx", function (d) { return x_scale(
-          dateStringToMonthName(d.monthCommencing)
-        ) + halfMonth; })
-      .attr("cy", function (d) { return scale_to_use(d[fieldName]); })
-      .attr("r", function (d) {
-        return 4.0;
-      });
+      //.append("circle")
+      .append('text')
+      .attr('font-family', 'FontAwesome')
+      .attr('font-size', '0.9em')
+      .text(function(d) { return icon; })
+      .attr("transform", function (d) {
+          return "translate(" + (x_scale(dateStringToMonthName(d.monthCommencing)) + halfMonth) + "," +
+            (scale_to_use(d[fieldName]) + 3) + ")";
+          }
+        )
+      .attr("class", cssClass);
   }
 
   /**
    * Draw a reference line
    */
-  function drawAReferenceLine (scale_to_use, value, cssClass) {
+  function drawAReferenceLine (scale_to_use, value, cssClass, pinTo) {
+    var x1 = margin.left;
+    var x2 = margin.left + width;
+
+    if (pinTo === 'right') {
+      x1 += 40;
+    }
+
+    if (pinTo === 'left') {
+      x2 -= 40;
+    }
     chart
     .append("line")
-    .attr("x1", margin.left)
-    .attr("x2", margin.left + width)
+    .attr("x1", x1)
+    .attr("x2", x2)
     .attr("y1", scale_to_use(value))
     .attr("y2", scale_to_use(value))
     .attr("class", "target " + cssClass);
@@ -232,10 +239,9 @@ function draw(data, targetSelector, targetLine, year) {
   /**
    * REFERENCE LINES
    */
-  drawAReferenceLine(y_scale, TARGET_25_percent, 'milestone');
-  drawAReferenceLine(y_scale, TARGET_50_percent, 'milestone');
-  drawAReferenceLine(y_scale, TARGET_75_percent, 'milestone');
-  drawAReferenceLine(y_scale, TARGET, 'goal');
+  drawAReferenceLine(y_scale, TARGET_1, 'goal goal-1', 'left');
+  drawAReferenceLine(y_scale, TARGET_2, 'goal goal-2', 'left');
+  drawAReferenceLine(y_scale_2, TARGET_3, 'goal goal-3', 'right');
 
   /**
    * BARS
@@ -323,9 +329,9 @@ function draw(data, targetSelector, targetLine, year) {
   /**
    * RUNNING TOTALS - LINES
    */
-  drawALine(1, "dollarRunningTotal", y_scale, 2014);
-  drawALine(2, "dollarRunningTotal", y_scale, 2015);
-  drawALine(3, "peopleRunningTotal", y_scale_2, 2014);
+  drawALine(1, "dollarRunningTotal", y_scale, 2014, '\uf155');
+  drawALine(2, "dollarRunningTotal", y_scale, 2015, '\uf155');
+  drawALine(3, "peopleRunningTotal", y_scale_2, 2014, '\uf007');
 
   /**
    * AXIS
@@ -360,6 +366,16 @@ function draw(data, targetSelector, targetLine, year) {
     .attr("transform", "translate(" + margin.left + ", 0 )")
   .call(y_axis);
 
+  // label
+  chart.append("text")
+    .attr("class", "label-1")
+    .attr("text-anchor", "middle")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("transform", "rotate(270) translate(-" + (height/2) + "," + (margin.left/4) + ")")
+    .text("$ Predicted income: 2014 and 2015");
+
+
   // Y-AXIS RIGHT (people scale)
   var y_axis_2 = d3.svg.axis()
                 .scale(y_scale_2)
@@ -370,10 +386,19 @@ function draw(data, targetSelector, targetLine, year) {
     .attr("transform", "translate(" + (width + margin.left) + ", 0 )")
   .call(y_axis_2);
 
+  // label
+  chart.append("text")
+    .attr("class", "label-3")
+    .attr("text-anchor", "middle")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("transform", "rotate(270) translate(-" + (height/2) + "," + (width + margin.left + (margin.right/4*3)) + ")")
+    .text("Predicted New Webmaker Accounts");
+
   resize_charts();
 }
 
 // Draw the D3 chart
 d3.json(GRAPH_DATA_ALL, function (data) {
-  draw(data, '#chartAll', 7000000, 2015);
+  draw(data, '#chartAll');
 });

@@ -1,14 +1,12 @@
-
 body,
 svg,
 .dashboard-container {
   background:  #090909;
 }
 
-
-
 h2, h3, h5 {
-  color: #FFF;
+  color: #999;
+  text-align: center;
 }
 
 .dashboard-container {
@@ -21,63 +19,6 @@ h2, h3, h5 {
 
 .definition {
   opacity: 0.5;
-}
-
-.key-box {
- float: right;
-}
-
-.key-box p {
-  display: inline;
-  float: left;
-  margin: 0 10px 0 5px;
-  color: #FFF;
-  font-size: 12px;
-  line-height: 20px;
-}
-
-.key {
-  display: inline;
-  float: left;
-  width: 10px;
-  height: 16px;
-  background: #FFF;
-  margin: 2px 5px 0 0;
-}
-
-.key.dollars-total {
-  border-radius: 10px;
-  width: 4px;
-  height: 4px;
-  margin-top: 8px;
-}
-
-.key.dollars-new {
-  background: #fff;
-}
-
-.key.people-total {
-  border-radius: 10px;
-  background: #FECB33;
-  width: 4px;
-  height: 4px;
-  margin-top: 8px;
-}
-
-.key.people-new {
-  background: #FECB33;
-}
-
-.people-key,
-.dollar-key {
-  display: inline;
-  float: right;
-  margin-right: 60px;
-}
-
-.people-key p,
-.people-key h5 {
-  color: #FECB33;
 }
 
 .wm-footer {
@@ -138,7 +79,6 @@ footer h5 {
   fill: none;
 }
 .tick text {
-  fill: #FFF;
   stroke: none;
 }
 
@@ -159,7 +99,6 @@ line.target {
 
 line.target.goal {
     fill: none;
-    stroke: #FFF;
     opacity: 1;
 }
 
@@ -226,42 +165,44 @@ circle {
 */
 
 /* default is Thing-1 */
-circle {
-  fill: #a6cee3;
-}
 
-circle.future-date,
-rect.bar-1.past-date {
+.tick text,
+text.line-1,
+rect.bar-1.past-date,
+.label-1 {
   fill: #a6cee3;
 }
 
 .line.line-1,
-.line.line-1.future-date {
+.line.line-1.future-date,
+line.target.goal-1 {
   stroke: #a6cee3;
 }
 
+
 /* Thing-2 */
 .line.line-2,
-.line.line-2.future-date {
+.line.line-2.future-date,
+line.target.goal-2 {
   stroke: #1f78b4;
 }
 
-circle.line-2,
-circle.line-2.future-date,
+text.line-2,
 rect.bar-2.past-date {
   fill: #1f78b4;
 }
 
 /* Thing-3 */
 .line.line-3,
-.line.line-3.future-date {
+.line.line-3.future-date,
+line.target.goal-3 {
   stroke: #b2df8a;
 }
 
-circle.line-3,
-circle.line-3.future-date,
+text.line-3,
 rect.bar-3.past-date,
-.y2 .tick text {
+.y2 .tick text,
+.label-3 {
   fill: #b2df8a;
 }
 
