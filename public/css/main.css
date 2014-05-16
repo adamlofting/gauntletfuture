@@ -1,5 +1,8 @@
-body {
-  background: #333;
+
+body,
+svg,
+.dashboard-container {
+  background:  #090909;
 }
 
 
@@ -9,7 +12,6 @@ h2, h3, h5 {
 }
 
 .dashboard-container {
-  background:  #333;
   padding: 20px 0 40px;
 }
 
@@ -54,7 +56,7 @@ h2, h3, h5 {
   background: #fff;
 }
 
-.key.contributors-total {
+.key.people-total {
   border-radius: 10px;
   background: #FECB33;
   width: 4px;
@@ -62,19 +64,19 @@ h2, h3, h5 {
   margin-top: 8px;
 }
 
-.key.contributors-new {
+.key.people-new {
   background: #FECB33;
 }
 
-.contributors-key,
+.people-key,
 .dollar-key {
   display: inline;
   float: right;
   margin-right: 60px;
 }
 
-.contributors-key p,
-.contributors-key h5 {
+.people-key p,
+.people-key h5 {
   color: #FECB33;
 }
 
@@ -116,10 +118,6 @@ footer h5 {
 
 /* Styling for D3 SVG Graph */
 
-svg {
-  background:  #333;
-}
-
 .axis path {
   fill: none;
   stroke: rgba(255,255,255,0.2);
@@ -148,49 +146,9 @@ svg {
   display: none;
 }
 
-.y2 .tick text {
-  fill: rgba(254, 203, 51, 1);
-}
-
-circle {
-  stroke: none;
-  fill: #fff;
-}
-
-circle.line-2 {
-  stroke: none;
-  fill: rgba(254, 203, 51, 1);
-}
-
-circle.line-2.future-date {
-  stroke: none;
-  fill: rgba(254, 203, 51, 1);
-}
-
-.line.line-1 {
-  fill: none;
-  stroke: #fff;
-  stroke-width: 1.5px;
-}
-
-.line.line-2 {
-  fill: none;
-  stroke: rgba(254, 203, 51, 1);
-  stroke-width: 1.5px;
-}
-
-.line.line-2.future-date {
-  stroke: rgba(254, 203, 51, 0.5);
-}
 
 
-rect.bar-1.past-date {
-  fill: #fff;
-}
 
-rect.bar-2.past-date {
-  fill: rgba(254, 203, 51, 1);
-}
 
 
 line.target {
@@ -205,24 +163,6 @@ line.target.goal {
     opacity: 1;
 }
 
-/* future dollars */
-circle.future-date {
-  fill: rgba(255, 255, 255, 1);
-}
-
-rect.future-date {
-
-}
-
-.line.line-1.future-date {
-  fill:none;
-  stroke: rgba(255, 255, 255, 0.5);
-}
-
-.line.line-2.future-date {
-  fill:none;
-  stroke: rgba(255, 255, 0, 0.5);
-}
 
 body rect {
   color: #F00;
@@ -267,3 +207,63 @@ rect.info-area {
 .row.year {
   margin-top: 30px;
 }
+
+
+
+circle {
+  stroke: none;
+}
+
+.line {
+  fill: none;
+  stroke-width: 1.5px;
+}
+
+/*
+  var color_1 = "#a6cee3";
+  var color_2 = "#1f78b4";
+  var color_3 = "#b2df8a";
+*/
+
+/* default is Thing-1 */
+circle {
+  fill: #a6cee3;
+}
+
+circle.future-date,
+rect.bar-1.past-date {
+  fill: #a6cee3;
+}
+
+.line.line-1,
+.line.line-1.future-date {
+  stroke: #a6cee3;
+}
+
+/* Thing-2 */
+.line.line-2,
+.line.line-2.future-date {
+  stroke: #1f78b4;
+}
+
+circle.line-2,
+circle.line-2.future-date,
+rect.bar-2.past-date {
+  fill: #1f78b4;
+}
+
+/* Thing-3 */
+.line.line-3,
+.line.line-3.future-date {
+  stroke: #b2df8a;
+}
+
+circle.line-3,
+circle.line-3.future-date,
+rect.bar-3.past-date,
+.y2 .tick text {
+  fill: #b2df8a;
+}
+
+
+

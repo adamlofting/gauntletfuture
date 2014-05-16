@@ -41,6 +41,11 @@ function draw(data, targetSelector, targetLine, year) {
   var lastMonth = new Date();
   lastMonth.setDate(now.getDate()-31);
 
+  // Color (from colorBrewer palletes)
+  var color_1 = "#a6cee3";
+  var color_2 = "#1f78b4";
+  var color_3 = "#b2df8a";
+
   // Graph settings
   var Y_SCALE_2_MAX_DEFAULT = 10000;
   var Y_SCALE_MAX_DEFAULT = TARGET * 1.25;
@@ -138,7 +143,7 @@ function draw(data, targetSelector, targetLine, year) {
         ) + halfMonth; })
       .attr("cy", function (d) { return scale_to_use(d[fieldName]); })
       .attr("r", function (d) {
-        return 2.0;
+        return 4.0;
       });
   }
 
@@ -170,11 +175,11 @@ function draw(data, targetSelector, targetLine, year) {
     .range([height + margin.top, margin.top])
     .domain([0,y_scale_max]);
 
-  // Y SCALE RIGHT (Contributors)
+  // Y SCALE RIGHT (people)
   var y_scale_2_max = Y_SCALE_2_MAX_DEFAULT;
-  var extent_contributors = d3.extent(data, function (d) { return d.peopleRunningTotal; });
-  if (extent_contributors[1] > y_scale_2_max) {
-    y_scale_2_max = extent_contributors[1];
+  var extent_people = d3.extent(data, function (d) { return d.peopleRunningTotal; });
+  if (extent_people[1] > y_scale_2_max) {
+    y_scale_2_max = extent_people[1];
   }
 
   var y_scale_2 = d3.scale.linear()
@@ -195,42 +200,34 @@ function draw(data, targetSelector, targetLine, year) {
     return "Grants:<br/>" +
           "<span style='color:#FFF;'>$" + $.number(d.dollarRunningTotal) + "</span> Total<br />" +
           "<span style='color:#FFF;'>$" + $.number(d.dollarNew) + "</span> New<br /><br />" +
-          "Potential Contributors:<br/>" +
+          "Potential Accounts:<br/>" +
           "<span style='color:#FECB33;'>" + $.number(d.peopleRunningTotal) + "</span> Total<br />" +
           "<span style='color:#FECB33;'>" + $.number(d.peopleNew) + "</span> New<br /><br />";
   });
 
   chart.call(tip);
 
-  // Re-usable hatch pattern - Dollars (white)
-  // .attr('fill', 'url(#patternHatchDollars)');
-  chart
-  .append('defs')
-  .append('pattern')
-    .attr('id', 'patternHatchDollars')
-    .attr('patternUnits', 'userSpaceOnUse')
-    .attr('width', 4)
-    .attr('height', 2)
-  .append('rect')
-    .attr('fill', '#FFF')
-    .attr('width', 4)
-    .attr('height', 1)
-    .attr('opacity', 0.5);
+  /**
+   * Patterns
+   */
+  function createPattern (name, color) {
+    chart
+    .append('defs')
+    .append('pattern')
+      .attr('id', name)
+      .attr('patternUnits', 'userSpaceOnUse')
+      .attr('width', 4)
+      .attr('height', 3)
+    .append('rect')
+      .attr('fill', color)
+      .attr('width', 4)
+      .attr('height', 2.5)
+      .attr('opacity', 0.5);
+  }
 
-  // Re-usable hatch pattern - Contributors (orange)
-  // .attr('fill', 'url(#patternHatchPeople)');
-  chart
-  .append('defs')
-  .append('pattern')
-    .attr('id', 'patternHatchPeople')
-    .attr('patternUnits', 'userSpaceOnUse')
-    .attr('width', 4)
-    .attr('height', 2)
-  .append('rect')
-    .attr('fill', '#FECB33')
-    .attr('width', 4)
-    .attr('height', 1)
-    .attr('opacity', 0.5);
+  createPattern('pattern-1', color_1);
+  createPattern('pattern-2', color_2);
+  createPattern('pattern-3', color_3);
 
   /**
    * REFERENCE LINES
@@ -316,22 +313,19 @@ function draw(data, targetSelector, targetLine, year) {
         });
   }
 
-
   /**
    * NEW - BARS
    */
-  drawBars(1, 2014, 'dollarNew', 'patternHatchDollars', y_scale);
-  drawBars(2, 2014, 'peopleNew', 'patternHatchPeople', y_scale_2);
-  drawBars(3, 2015, 'dollarNew', 'patternHatchDollars', y_scale);
-
+  drawBars(1, 2014, 'dollarNew', 'pattern-1', y_scale);
+  drawBars(2, 2015, 'dollarNew', 'pattern-2', y_scale);
+  drawBars(3, 2014, 'peopleNew', 'pattern-3', y_scale_2);
 
   /**
    * RUNNING TOTALS - LINES
    */
   drawALine(1, "dollarRunningTotal", y_scale, 2014);
-  drawALine(1, "dollarRunningTotal", y_scale, 2015);
-  drawALine(2, "peopleRunningTotal", y_scale_2, 2014);
-
+  drawALine(2, "dollarRunningTotal", y_scale, 2015);
+  drawALine(3, "peopleRunningTotal", y_scale_2, 2014);
 
   /**
    * AXIS
@@ -366,7 +360,7 @@ function draw(data, targetSelector, targetLine, year) {
     .attr("transform", "translate(" + margin.left + ", 0 )")
   .call(y_axis);
 
-  // Y-AXIS RIGHT (contributor scale)
+  // Y-AXIS RIGHT (people scale)
   var y_axis_2 = d3.svg.axis()
                 .scale(y_scale_2)
                 .orient("right");
