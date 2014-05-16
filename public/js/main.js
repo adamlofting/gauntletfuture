@@ -1,32 +1,14 @@
-var GRAPH_DATA_2014 = "/api/2014";
-var GRAPH_DATA_2015 = "/api/2015";
 var GRAPH_DATA_ALL = "/api/all";
 
 /**
  * RESPONSIVE
  * Make the SVG charts scale with responsive container divs
  */
-var chart1 = $("#chart1"),
-    aspect1 = chart1.width() / chart1.height(),
-    container1 = chart1.parent();
-
-var chart2 = $("#chart2"),
-    aspect2 = chart2.width() / chart2.height(),
-    container2 = chart2.parent();
-
 var chartAll = $("#chartAll"),
     aspectAll = chartAll.width() / chartAll.height(),
     containerAll = chartAll.parent();
 
 function resize_charts () {
-  var targetWidth1 = container1.width();
-  chart1.attr("width", targetWidth1);
-  chart1.attr("height", Math.round(targetWidth1 / aspect1));
-
-  var targetWidth2 = container2.width();
-  chart2.attr("width", targetWidth2);
-  chart2.attr("height", Math.round(targetWidth2 / aspect2));
-
   var targetWidthAll = containerAll.width();
   chartAll.attr("width", targetWidthAll);
   chartAll.attr("height", Math.round(targetWidthAll / aspectAll));
@@ -424,14 +406,6 @@ function draw(data, targetSelector, targetLine, year) {
 }
 
 // Draw the D3 chart
-d3.json(GRAPH_DATA_2014, function (data) {
-  draw(data, '#chart1', 7000000, 2014);
-});
-
-d3.json(GRAPH_DATA_2015, function (data) {
-  draw(data, '#chart2', 7000000, 2015);
-});
-
 d3.json(GRAPH_DATA_ALL, function (data) {
   draw(data, '#chartAll', 7000000, 2015);
 });
