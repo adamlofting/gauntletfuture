@@ -24,6 +24,12 @@ app.get('/api/all', function(req, res) {
   });
 });
 
+app.get('/api/targets', function(req, res) {
+  data.getTargets(function gotTargets (err, result) {
+    res.json(result);
+  });
+});
+
 var port = Number(process.env.PORT || 5000);
 app.listen(port, function () {
   console.log("Listening on " + port);
