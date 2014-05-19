@@ -40,7 +40,7 @@ function saveAmount(amount, callback) {
   });
 }
 
-function clearAmounts(callback) {
+function clearAmounts(src, callback) {
   var connection = mysql.createConnection(connectionOptions);
   connection.connect(function connectionAttempted(err) {
 
@@ -50,7 +50,7 @@ function clearAmounts(callback) {
 
     } else {
 
-      connection.query('TRUNCATE amounts', function (err, result) {
+      connection.query('DELETE FROM gauntlet.amounts WHERE src=?;', src, function (err, result) {
         if (err) {
           console.error(err);
           callback(err);
@@ -62,11 +62,11 @@ function clearAmounts(callback) {
   });
 }
 
-function saveAmounts(amounts, callback) {
+function saveAmounts(amounts, src, callback) {
   async.waterfall([
 
     function (callback) {
-      clearAmounts(function cleared() {
+      clearAmounts(src, function cleared() {
         console.log('Amounts Cleared');
         callback(null);
       });
@@ -99,7 +99,7 @@ function savePeopleCount(count, callback) {
 
     } else {
 
-      connection.query('INSERT INTO contributors SET ?', count, function (err, result) {
+      connection.query('INSERT INTO people SET ?', count, function (err, result) {
         if (err) {
           console.error(err);
           callback(err);
@@ -111,7 +111,7 @@ function savePeopleCount(count, callback) {
   });
 }
 
-function clearPeopleCounts(callback) {
+function clearPeopleCounts(src, callback) {
   var connection = mysql.createConnection(connectionOptions);
   connection.connect(function connectionAttempted(err) {
 
@@ -121,7 +121,7 @@ function clearPeopleCounts(callback) {
 
     } else {
 
-      connection.query('TRUNCATE contributors', function (err, result) {
+      connection.query('DELETE FROM gauntlet.people WHERE src=?;', src, function (err, result) {
         if (err) {
           console.error(err);
           callback(err);
@@ -133,11 +133,11 @@ function clearPeopleCounts(callback) {
   });
 }
 
-function savePeopleCounts(counts, callback) {
+function savePeopleCounts(counts, src, callback) {
   async.waterfall([
 
     function (callback) {
-      clearPeopleCounts(function cleared() {
+      clearPeopleCounts(src, function cleared() {
         console.log('People counts Cleared');
         callback(null);
       });
@@ -145,10 +145,10 @@ function savePeopleCounts(counts, callback) {
     function (callback) {
       async.eachSeries(counts, savePeopleCount, function (err) {
         if (err) {
-          console.log('Error saving a count');
+          console.log('Error saving a people count');
           console.log(err);
         } else {
-          console.log('All counts have been processed successfully');
+          console.log('All people counts have been processed successfully');
           callback();
         }
       });
@@ -160,15 +160,17 @@ function savePeopleCounts(counts, callback) {
 }
 
 // PROCESSING
-function processCSV(fetchecCSV, callback) {
+function processGauntletMainCSV(fetchedCSV, callback) {
   var amountsToSave = [];
   var allPeopleToSave = [];
+  var src = 'main';
 
   function addToAmounts(date, amount, field) {
     amount = util.toInt(amount);
     if (util.isValidDate(date) && (amount > 0)) {
       var amountToSave = {
-        'yesdate': util.dateToISOtring(new Date(date))
+        'yesdate': util.dateToISOtring(new Date(date)),
+        'src': src
       };
       amountToSave[field] = amount;
       console.log(amountToSave);
@@ -180,7 +182,8 @@ function processCSV(fetchecCSV, callback) {
     count = util.toInt(count);
     if (util.isValidDate(date) && (count > 0)) {
       var peopleToSave = {
-        'yesdate': util.dateToISOtring(new Date(date))
+        'yesdate': util.dateToISOtring(new Date(date)),
+        'src': src
       };
       peopleToSave[field] = count;
       console.log(peopleToSave);
@@ -189,7 +192,7 @@ function processCSV(fetchecCSV, callback) {
   }
 
   csv()
-    .from.string(fetchecCSV, {
+    .from.string(fetchedCSV, {
       columns: true,
       delimiter: ',',
       escape: '"',
@@ -230,7 +233,7 @@ function processCSV(fetchecCSV, callback) {
         console.log("* Prospect yes date and 2015 dollar");
         addToAmounts(row.prospectyesdate, row.prospect2015predictiondollar, '2015dollar');
       }
-      // Contributors
+      // people
       if (row.closedyesdate && row.closed2014contributor) {
         console.log("* Closed yes date and 2014 contributor");
         addToPeople(row.closedyesdate, row.closed2014contributor, '2014people');
@@ -264,7 +267,7 @@ function processCSV(fetchecCSV, callback) {
       async.parallel([
         function(callback){
           if (amountsToSave.length > 0) {
-            saveAmounts(amountsToSave, function savedAmounts(err, res) {
+            saveAmounts(amountsToSave, src, function savedAmounts(err, res) {
               if (err) {
                 console.log(err);
               }
@@ -275,7 +278,7 @@ function processCSV(fetchecCSV, callback) {
         },
         function(callback){
           if (allPeopleToSave.length > 0) {
-            savePeopleCounts(allPeopleToSave, function savedCounts(err, res) {
+            savePeopleCounts(allPeopleToSave, src, function savedCounts(err, res) {
               if (err) {
                 console.log(err);
               }
@@ -296,30 +299,149 @@ function processCSV(fetchecCSV, callback) {
     });
 }
 
-function importMainGauntlet (callback) {
-  // get the latest from Google
-    request.get('https://docs.google.com/spreadsheet/pub?key=0AvbQej-RMUQMdDFROXprcjNSVlQyV3hLOXRueWM1Qmc&single=true&gid=25&output=csv',
-      function (err, res, body) {
-        if (!err && res.statusCode === 200) {
-          var csv = body;
-          processCSV(csv, function processedCSV(err) {
-            if (err) {
-              console.log(err);
-              callback(err);
-            }
-            callback(null);
-          });
-        } else {
-          console.log("Error fetching Google Doc");
-          callback(null);
-        }
+function processGauntletMakerPartyCSV(fetchedCSV, callback) {
+  var allPeopleToSave = [];
+  var src = 'makerparty';
+
+  function addToPeople(date, count, field) {
+    count = util.toInt(count);
+    if (util.isValidDate(date) && (count > 0)) {
+      var peopleToSave = {
+        'yesdate': util.dateToISOtring(new Date(date)),
+        'src': src
+      };
+      peopleToSave[field] = count;
+      console.log(peopleToSave);
+      allPeopleToSave.push(peopleToSave);
+    }
+  }
+
+  csv()
+    .from.string(fetchedCSV, {
+      columns: true,
+      delimiter: ',',
+      escape: '"',
+    })
+    .to.stream(process.stdout, {
+      columns: ['planneddate',
+        'expectedaccounts',
+        'actualaccounts',
+      ]
+    })
+    .transform(function (row) {
+      console.log('\n\n-------------');
+      console.log(' ');
+      if (row.planneddate && row.actualaccounts) {
+        // if there are real results (acutal accounts), use those
+        console.log("* Yes date and actual accounts");
+        addToPeople(row.planneddate, row.actualaccounts, '2014people');
+      } else if (row.planneddate && row.expectedaccounts) {
+        // otherwise report on predictions
+        console.log("* Yes date and predicted accounts");
+        addToPeople(row.planneddate, row.expectedaccounts, '2014people');
       }
-    );
+      console.log(' ');
+      console.log('Raw row:');
+      return row;
+    })
+    .on('end', function (count) {
+      // when writing to a file, use the 'close' event
+      // the 'end' event may fire before the file has been written
+      console.log('Number of lines: ' + count);
+      console.log('PEOPLE TO SAVE');
+      console.log(allPeopleToSave);
+      console.log('============');
+
+      if (allPeopleToSave.length > 0) {
+        savePeopleCounts(allPeopleToSave, src, function savedCounts(err, res) {
+
+          if (err) {
+            console.log(err);
+            callback (err);
+          } else {
+
+            console.log('Maker Party Counts saved.');
+            callback(null);
+
+          }
+        });
+      } else {
+        console.log('No data received in Maker Party Gauntlet');
+      }
+
+    })
+    .on('error', function (error) {
+      console.log(error.message);
+    });
 }
 
-importMainGauntlet(function importedMainGauntle(err) {
-  if (err) {
-    console.log(err);
-  }
-  console.log('IMPORTED MAIN GAUNTLET');
-});
+function importMainGauntlet (callback) {
+  // get the latest from Google
+  request.get('https://docs.google.com/spreadsheet/pub?key=0AvbQej-RMUQMdDFROXprcjNSVlQyV3hLOXRueWM1Qmc&single=true&gid=25&output=csv',
+    function (err, res, body) {
+      if (!err && res.statusCode === 200) {
+        var csv = body;
+        processGauntletMainCSV(csv, function processedCSV(err) {
+          if (err) {
+            console.log(err);
+            callback(err);
+          }
+          callback(null);
+        });
+      } else {
+        console.log("Error fetching Google Doc (Gauntlet Main)");
+        callback(null);
+      }
+    }
+  );
+}
+
+function importMakerPartyGauntlet (callback) {
+  // get the latest from Google
+  request.get('https://docs.google.com/spreadsheets/d/1R76-cRZj1HSLLtyLMAEURdxPkk-qXK9lgJLnSxUUtao/export?format=csv&id=1R76-cRZj1HSLLtyLMAEURdxPkk-qXK9lgJLnSxUUtao&gid=52169416',
+    function (err, res, body) {
+      if (!err && res.statusCode === 200) {
+        var csv = body;
+        processGauntletMakerPartyCSV(csv, function processedCSV(err) {
+          if (err) {
+            console.log(err);
+            callback(err);
+          }
+          callback(null);
+        });
+      } else {
+        console.log("Error fetching Google Doc (Gauntlet Maker Party)");
+        callback(null);
+      }
+    }
+  );
+}
+
+function importAll (callback) {
+  async.series({
+      gauntletMain: function(callback){
+        importMainGauntlet(function importedMainGauntle(err) {
+          if (err) {
+            console.log(err);
+          }
+          console.log('IMPORTED MAIN GAUNTLET');
+          callback(null, null);
+        });
+      },
+      gauntletMakerParty: function(callback){
+        importMakerPartyGauntlet(function importedMakerPartyGauntle(err) {
+          if (err) {
+            console.log(err);
+          }
+          console.log('IMPORTED MAKER PARTY GAUNTLET');
+          callback(null, null);
+        });
+      }
+  },
+  // optional callback
+  function(err, results){
+    console.log('done');
+  });
+}
+
+importAll();
