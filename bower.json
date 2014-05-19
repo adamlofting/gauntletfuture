@@ -1,5 +1,5 @@
 {
-  "name": "mofo-contributors-dashboard",
+  "name": "mofo-gauntlet-dashboard",
   "dependencies": {
     "makerstrap": "latest",
     "jquery-number": "~2.1.3",
