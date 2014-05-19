@@ -158,6 +158,22 @@ circle {
   stroke-width: 1.5px;
 }
 
+line.target {
+  shape-rendering: crispedges;
+}
+
+.target-label {
+  font-size: 12px;
+}
+
+.target-label.shadow-version {
+  stroke:#111;
+  stroke-width:8px;
+  stroke-linecap:butt;
+  stroke-linejoin:miter;
+  stroke-opacity:1;
+}
+
 /*
   var color_1 = "#a6cee3";
   var color_2 = "#1f78b4";
@@ -169,42 +185,47 @@ circle {
 .tick text,
 text.line-1,
 rect.bar-1.past-date,
-.label-1 {
+.label-1,
+.target-label.goal-1  {
   fill: #a6cee3;
 }
 
 .line.line-1,
 .line.line-1.future-date,
-line.target.goal-1 {
+line.target.goal-1,
+.axis.y1 path {
   stroke: #a6cee3;
 }
 
 
 /* Thing-2 */
+text.line-2,
+rect.bar-2.past-date,
+.target-label.goal-2 {
+  fill: #1f78b4;
+}
+
 .line.line-2,
 .line.line-2.future-date,
 line.target.goal-2 {
   stroke: #1f78b4;
 }
 
-text.line-2,
-rect.bar-2.past-date {
-  fill: #1f78b4;
-}
 
 /* Thing-3 */
-.line.line-3,
-.line.line-3.future-date,
-line.target.goal-3 {
-  stroke: #b2df8a;
-}
-
 text.line-3,
 rect.bar-3.past-date,
 .y2 .tick text,
-.label-3 {
+.label-3,
+.target-label.goal-3 {
   fill: #b2df8a;
 }
 
+.line.line-3,
+.line.line-3.future-date,
+line.target.goal-3,
+.axis.y2 path {
+  stroke: #b2df8a;
+}
 
 

@@ -50,13 +50,13 @@ function draw(data, targetSelector) {
   var color_3 = "#b2df8a";
 
   // Graph settings
-  var Y_SCALE_2_MAX_DEFAULT = TARGET_3 * 1.25;
-  var Y_SCALE_MAX_DEFAULT = TARGET_1 * 1.25;
+  var Y_SCALE_2_MAX_DEFAULT = Math.round(TARGET_3 * 1.1);
+  var Y_SCALE_MAX_DEFAULT = Math.round(TARGET_1 * 1.25);
   var TARGET_25_percent = Math.round(TARGET_1 * 0.25),
       TARGET_50_percent = Math.round(TARGET_1 * 0.5),
       TARGET_75_percent = Math.round(TARGET_1 * 0.75);
 
-  var margin = {top: 20, right: 140, bottom: 45, left: 140};
+  var margin = {top: 20, right: 100, bottom: 45, left: 100};
       margin.vertical = margin.top + margin.bottom;
       margin.horizontal = margin.left + margin.right;
 
@@ -147,24 +147,46 @@ function draw(data, targetSelector) {
   /**
    * Draw a reference line
    */
-  function drawAReferenceLine (scale_to_use, value, cssClass, pinTo) {
-    var x1 = margin.left;
-    var x2 = margin.left + width;
+  function drawAReferenceLine (scale_to_use, value, cssClass, pinTo, unit, year) {
+    var space = Math.round(width / 12)
+    var x1 = margin.left + space;
+    var x2 = margin.left + width - space;
+    var labelX, textAnchor;
 
     if (pinTo === 'right') {
-      x1 += 40;
+      // x1 += space;
+      labelX = margin.left + width - space + (space/12);
+      textAnchor = "start";
     }
 
     if (pinTo === 'left') {
-      x2 -= 40;
+      // x2 -= space;
+      labelX = margin.left + space - (space/12);
+      textAnchor = "end";
     }
+
+    var format = d3.format("0,000");
+
     chart
-    .append("line")
-    .attr("x1", x1)
-    .attr("x2", x2)
-    .attr("y1", scale_to_use(value))
-    .attr("y2", scale_to_use(value))
-    .attr("class", "target " + cssClass);
+      .append("line")
+      .attr("x1", x1)
+      .attr("x2", x2)
+      .attr("y1", scale_to_use(value))
+      .attr("y2", scale_to_use(value))
+      .attr("class", "target " + cssClass);
+
+    function addLabel (extraCSSStyle) {
+      chart
+      .append("text")
+      .attr("class", "target-label " + cssClass + " " + extraCSSStyle)
+      .attr("text-anchor", textAnchor)
+      .attr("x", labelX)
+      .attr("y", scale_to_use(value) + 5)
+      .attr("transform", "rotate(0) translate(0,0)")
+      .text(year + " target: " + unit + format(value));
+    }
+    addLabel("shadow-version");
+    addLabel("front-version");
   }
 
   /**
@@ -196,7 +218,7 @@ function draw(data, targetSelector) {
   // X SCALE ORDINAL
   var x_scale = d3.scale.ordinal()
     .domain(MONTH_NAMES)
-    .rangeBands([margin.left, margin.left + width],0.1,0.1)
+    .rangeBands([margin.left, margin.left + width],0.1,0.8)
     ;
 
   // TOOL TIP
@@ -228,8 +250,8 @@ function draw(data, targetSelector) {
     .append('rect')
       .attr('fill', color)
       .attr('width', 4)
-      .attr('height', 1)
-      .attr('opacity', 0.5);
+      .attr('height', 1);
+      //.attr('opacity', 0.5);
   }
 
   createPattern('pattern-1', color_1);
@@ -239,9 +261,9 @@ function draw(data, targetSelector) {
   /**
    * REFERENCE LINES
    */
-  drawAReferenceLine(y_scale, TARGET_1, 'goal goal-1', 'left');
-  drawAReferenceLine(y_scale, TARGET_2, 'goal goal-2', 'left');
-  drawAReferenceLine(y_scale_2, TARGET_3, 'goal goal-3', 'right');
+  drawAReferenceLine(y_scale, TARGET_2, 'goal goal-2', 'left', '$', '2015');
+  drawAReferenceLine(y_scale, TARGET_1, 'goal goal-1', 'left', '$', '2014');
+  drawAReferenceLine(y_scale_2, TARGET_3, 'goal goal-3', 'right', '', '2014');
 
   /**
    * BARS
@@ -344,48 +366,48 @@ function draw(data, targetSelector) {
     .style("text-anchor", "start");
 
   // Y-AXIS LEFT (dollar scale)
-  var y_axis = d3.svg.axis()
-                .scale(y_scale)
-                .orient("left")
-                .tickValues(TICK_VALUES)
-                .tickFormat(function (d) {
-                  var format_number = d3.format(["$", ""]);
-                  return format_number(d);
-                });
-  chart
-  .append("g")
-    .attr("class", "y axis")
-    .attr("transform", "translate(" + margin.left + ", 0 )")
-  .call(y_axis);
+  // var y_axis = d3.svg.axis()
+  //               .scale(y_scale)
+  //               .orient("left")
+  //               .tickValues(TICK_VALUES)
+  //               .tickFormat(function (d) {
+  //                 var format_number = d3.format(["$", ""]);
+  //                 return format_number(d);
+  //               });
+  // chart
+  // .append("g")
+  //   .attr("class", "y axis y1")
+  //   .attr("transform", "translate(" + margin.left + ", 0 )")
+  // .call(y_axis);
 
   // label
-  chart.append("text")
-    .attr("class", "label-1")
-    .attr("text-anchor", "middle")
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("transform", "rotate(270) translate(-" + (height/2) + "," + (margin.left/4) + ")")
-    .text("$ Predicted income: 2014 and 2015");
+  // chart.append("text")
+  //   .attr("class", "label-1")
+  //   .attr("text-anchor", "middle")
+  //   .attr("x", 0)
+  //   .attr("y", 0)
+  //   .attr("transform", "rotate(270) translate(-" + (height/2) + "," + (margin.left/4) + ")")
+  //   .text("$ Predicted income: 2014 and 2015");
 
 
   // Y-AXIS RIGHT (people scale)
-  var y_axis_2 = d3.svg.axis()
-                .scale(y_scale_2)
-                .orient("right");
-  chart
-  .append("g")
-    .attr("class", "y axis y2")
-    .attr("transform", "translate(" + (width + margin.left) + ", 0 )")
-  .call(y_axis_2);
+  // var y_axis_2 = d3.svg.axis()
+  //               .scale(y_scale_2)
+  //               .orient("right");
+  // chart
+  // .append("g")
+  //   .attr("class", "y axis y2")
+  //   .attr("transform", "translate(" + (width + margin.left) + ", 0 )")
+  // .call(y_axis_2);
 
   // label
-  chart.append("text")
-    .attr("class", "label-3")
-    .attr("text-anchor", "middle")
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("transform", "rotate(270) translate(-" + (height/2) + "," + (width + margin.left + (margin.right/4*3)) + ")")
-    .text("Predicted New Webmaker User Accounts");
+  // chart.append("text")
+  //   .attr("class", "label-3")
+  //   .attr("text-anchor", "middle")
+  //   .attr("x", 0)
+  //   .attr("y", 0)
+  //   .attr("transform", "rotate(270) translate(-" + (height/2) + "," + (width + margin.left + (margin.right/4*3)) + ")")
+  //   .text("Predicted New Webmaker User Accounts");
 
   resize_charts();
 }
