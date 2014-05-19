@@ -84,16 +84,18 @@ function draw(data, targetSelector) {
    * Add a label (to use with reference line and actual lines)
    */
   function addLabel (cssClass, extraCSSStyle, pos, scale_to_use, description, value, postfix) {
-      var labelX, textAnchor;
+      var labelX, textAnchor, nudge;
 
       if (pos === 'right') {
         labelX = margin.left + width - SPACER + (SPACER/12);
         textAnchor = "start";
+        nudge = 3;
       }
 
       if (pos === 'left') {
         labelX = margin.left + SPACER - (SPACER/12);
         textAnchor = "end";
+        nudge = 5;
       }
 
       var format = d3.format("0,000");
@@ -103,7 +105,7 @@ function draw(data, targetSelector) {
       .attr("class", "target-label " + cssClass + " " + extraCSSStyle)
       .attr("text-anchor", textAnchor)
       .attr("x", labelX)
-      .attr("y", scale_to_use(value) + 5)
+      .attr("y", scale_to_use(value) + nudge)
       .attr("transform", "rotate(0) translate(0,0)")
       .text(description + format(value) + postfix);
     }

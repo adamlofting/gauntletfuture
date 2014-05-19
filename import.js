@@ -78,12 +78,13 @@ function saveAmounts(amounts, callback) {
           console.log(err);
         } else {
           console.log('All amounts have been processed successfully');
-          callback();
+          callback(null);
         }
       });
     }
   ], function (err, result) {
     console.log("Amounds Cleared and Latest Saved");
+    callback(null);
   });
 }
 
@@ -154,11 +155,12 @@ function savePeopleCounts(counts, callback) {
     }
   ], function (err, result) {
     console.log("Counts Cleared and Latest Saved");
+    callback(null);
   });
 }
 
 // PROCESSING
-function processCSV(fetchecCSV) {
+function processCSV(fetchecCSV, callback) {
   var amountsToSave = [];
   var allPeopleToSave = [];
 
@@ -259,23 +261,34 @@ function processCSV(fetchecCSV) {
       console.log(allPeopleToSave);
       console.log('============');
 
-      if (amountsToSave.length > 0) {
-        saveAmounts(amountsToSave, function savedAmounts(err, res) {
-          if (err) {
-            console.log(err);
+      async.parallel([
+        function(callback){
+          if (amountsToSave.length > 0) {
+            saveAmounts(amountsToSave, function savedAmounts(err, res) {
+              if (err) {
+                console.log(err);
+              }
+              console.log('Amounts saved.');
+              callback(null);
+            });
           }
-          console.log('AMOUNTS SAVED!!!');
-        });
-      }
+        },
+        function(callback){
+          if (allPeopleToSave.length > 0) {
+            savePeopleCounts(allPeopleToSave, function savedCounts(err, res) {
+              if (err) {
+                console.log(err);
+              }
+              console.log('Counts saved.');
+              callback(null);
+            });
+          }
+        }
+      ],
+      function(err, results){
+        callback(err);
+      });
 
-      if (allPeopleToSave.length > 0) {
-        savePeopleCounts(allPeopleToSave, function savedCounts(err, res) {
-          if (err) {
-            console.log(err);
-          }
-          console.log('COUNTS SAVED!!!');
-        });
-      }
 
     })
     .on('error', function (error) {
@@ -283,18 +296,30 @@ function processCSV(fetchecCSV) {
     });
 }
 
-function runImport () {
+function importMainGauntlet (callback) {
   // get the latest from Google
     request.get('https://docs.google.com/spreadsheet/pub?key=0AvbQej-RMUQMdDFROXprcjNSVlQyV3hLOXRueWM1Qmc&single=true&gid=25&output=csv',
       function (err, res, body) {
         if (!err && res.statusCode === 200) {
           var csv = body;
-          processCSV(csv);
+          processCSV(csv, function processedCSV(err) {
+            if (err) {
+              console.log(err);
+              callback(err);
+            }
+            callback(null);
+          });
         } else {
           console.log("Error fetching Google Doc");
+          callback(null);
         }
       }
     );
 }
 
-runImport();
+importMainGauntlet(function importedMainGauntle(err) {
+  if (err) {
+    console.log(err);
+  }
+  console.log('IMPORTED MAIN GAUNTLET');
+});
