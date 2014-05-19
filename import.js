@@ -159,6 +159,51 @@ function savePeopleCounts(counts, src, callback) {
   });
 }
 
+// targets
+function saveTargets(targets, callback) {
+  var connection = mysql.createConnection(connectionOptions);
+  connection.connect(function connectionAttempted(err) {
+
+    if (err) {
+      console.error(err);
+      callback(err);
+
+    } else {
+
+      connection.query('INSERT INTO targets SET ?', targets, function (err, result) {
+        if (err) {
+          console.error(err);
+          callback(err);
+        }
+        connection.end();
+        callback(null);
+      });
+    }
+  });
+}
+
+// targets
+function clearTargets(callback) {
+  var connection = mysql.createConnection(connectionOptions);
+  connection.connect(function connectionAttempted(err) {
+
+    if (err) {
+      console.error(err);
+      callback(err);
+
+    } else {
+      connection.query('TRUNCATE targets', function (err, result) {
+        if (err) {
+          console.error(err);
+          callback(err);
+        }
+        connection.end();
+        callback(null);
+      });
+    }
+  });
+}
+
 // PROCESSING
 function processGauntletMainCSV(fetchedCSV, callback) {
   var amountsToSave = [];
@@ -296,6 +341,7 @@ function processGauntletMainCSV(fetchedCSV, callback) {
     })
     .on('error', function (error) {
       console.log(error.message);
+      callback(null);
     });
 }
 
@@ -367,11 +413,92 @@ function processGauntletMakerPartyCSV(fetchedCSV, callback) {
         });
       } else {
         console.log('No data received in Maker Party Gauntlet');
+        callback(null);
       }
 
     })
     .on('error', function (error) {
       console.log(error.message);
+      callback(null);
+    });
+}
+
+function processTargetsCSV(fetchedCSV, callback) {
+  var targetsToSave = {};
+
+  csv()
+    .from.string(fetchedCSV, {
+      columns: true,
+      delimiter: ',',
+      escape: '"',
+    })
+    .to.stream(process.stdout, {
+      columns: ['targetdollars2014',
+        'targetdollars2015',
+        'targetaccounts2014',
+      ]
+    })
+    .transform(function (row) {
+      console.log('\n\n-------------');
+      console.log(' ');
+      if (row.targetdollars2014) {
+        // some data has loaded
+        targetsToSave = {
+          'targetdollars2014': util.toInt(row.targetdollars2014),
+          'targetdollars2015': util.toInt(row.targetdollars2015),
+          'targetaccounts2014': util.toInt(row.targetaccounts2014)
+        };
+      }
+      return row;
+    })
+    .on('end', function (count) {
+      // when writing to a file, use the 'close' event
+      // the 'end' event may fire before the file has been written
+      console.log('targetsToSave');
+      console.log(targetsToSave);
+      console.log('============');
+
+      if (targetsToSave.targetdollars2014 > 0) {
+
+        async.series([
+          function(callback){
+            clearTargets(function clearedTargets(err, res) {
+              if (err) {
+                console.log(err);
+                callback (err);
+              } else {
+
+                console.log('Targets Cleared.');
+                callback(null);
+              }
+            });
+          },
+          function(callback){
+            saveTargets(targetsToSave, function savedTargets(err, res) {
+              if (err) {
+                console.log(err);
+                callback (err);
+              } else {
+
+                console.log('Targets saved.');
+                callback(null);
+              }
+            });
+          }
+        ],
+        function(err, results){
+            callback(null);
+        });
+
+      } else {
+        console.log('No data received in Targets');
+        callback(null);
+      }
+
+    })
+    .on('error', function (error) {
+      console.log(error.message);
+      callback(null);
     });
 }
 
@@ -417,6 +544,27 @@ function importMakerPartyGauntlet (callback) {
   );
 }
 
+function importTargets (callback) {
+  // get the latest from Google
+  request.get('https://docs.google.com/spreadsheets/d/1ltIwmMz1oqGAXujCuYUQPNDeZZzQXDm7NCXNJDHhHOA/export?format=csv&id=1ltIwmMz1oqGAXujCuYUQPNDeZZzQXDm7NCXNJDHhHOA&gid=0',
+    function (err, res, body) {
+      if (!err && res.statusCode === 200) {
+        var csv = body;
+        processTargetsCSV(csv, function processedCSV(err) {
+          if (err) {
+            console.log(err);
+            callback(err);
+          }
+          callback(null);
+        });
+      } else {
+        console.log("Error fetching Google Doc (Targets)");
+        callback(null);
+      }
+    }
+  );
+}
+
 function importAll (callback) {
   async.series({
       gauntletMain: function(callback){
@@ -434,6 +582,15 @@ function importAll (callback) {
             console.log(err);
           }
           console.log('IMPORTED MAKER PARTY GAUNTLET');
+          callback(null, null);
+        });
+      },
+      targets: function(callback){
+        importTargets(function importedTargets(err) {
+          if (err) {
+            console.log(err);
+          }
+          console.log('IMPORTED TARGETS');
           callback(null, null);
         });
       }
