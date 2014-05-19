@@ -5,7 +5,7 @@ svg,
 }
 
 h2, h3, h5 {
-  color: #999;
+  color: #777;
   text-align: center;
 }
 
@@ -181,6 +181,9 @@ line.target {
 */
 
 /* default is Thing-1 */
+span.money {
+  color: #a6cee3;
+}
 
 .tick text,
 text.line-1,
@@ -213,6 +216,10 @@ line.target.goal-2 {
 
 
 /* Thing-3 */
+span.people {
+  color: #b2df8a;
+}
+
 text.line-3,
 rect.bar-3.past-date,
 .y2 .tick text,

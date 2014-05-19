@@ -66,6 +66,7 @@ function draw(data, targetSelector) {
   var VIEWBOX = "0 0 " + (width + margin.horizontal) + " " + (height + margin.vertical);
 
   var TICK_VALUES = [TARGET_25_percent, TARGET_50_percent, TARGET_75_percent, TARGET_1, Y_SCALE_MAX_DEFAULT];
+  var SPACER = Math.round(width / 12);
 
   /**
    * CONTATINER
@@ -78,6 +79,34 @@ function draw(data, targetSelector) {
   /**
    * FUNCTIONS
    */
+
+  /**
+   * Add a label (to use with reference line and actual lines)
+   */
+  function addLabel (cssClass, extraCSSStyle, pos, scale_to_use, description, value, postfix) {
+      var labelX, textAnchor;
+
+      if (pos === 'right') {
+        labelX = margin.left + width - SPACER + (SPACER/12);
+        textAnchor = "start";
+      }
+
+      if (pos === 'left') {
+        labelX = margin.left + SPACER - (SPACER/12);
+        textAnchor = "end";
+      }
+
+      var format = d3.format("0,000");
+
+      chart
+      .append("text")
+      .attr("class", "target-label " + cssClass + " " + extraCSSStyle)
+      .attr("text-anchor", textAnchor)
+      .attr("x", labelX)
+      .attr("y", scale_to_use(value) + 5)
+      .attr("transform", "rotate(0) translate(0,0)")
+      .text(description + format(value) + postfix);
+    }
 
   /**
    * Draw a line
@@ -142,30 +171,27 @@ function draw(data, targetSelector) {
           }
         )
       .attr("class", cssClass);
+
+      chart
+      .selectAll("points")
+      .data(data.filter(function (d) {
+          var date = new Date(d.monthCommencing);
+          // get the value for December of this year
+          if ((date.getMonth() === 11) && (date.getUTCFullYear() === year)) {
+            addLabel(cssClass, "front-version", "right", scale_to_use, "", d[fieldName], " predicted");
+          }
+          return;
+        }));
   }
 
   /**
    * Draw a reference line
    */
-  function drawAReferenceLine (scale_to_use, value, cssClass, pinTo, unit, year) {
-    var space = Math.round(width / 12)
-    var x1 = margin.left + space;
-    var x2 = margin.left + width - space;
-    var labelX, textAnchor;
+  function drawAReferenceLine (scale_to_use, value, cssClass, pos, unit, year) {
 
-    if (pinTo === 'right') {
-      // x1 += space;
-      labelX = margin.left + width - space + (space/12);
-      textAnchor = "start";
-    }
-
-    if (pinTo === 'left') {
-      // x2 -= space;
-      labelX = margin.left + space - (space/12);
-      textAnchor = "end";
-    }
-
-    var format = d3.format("0,000");
+    var x1 = margin.left + SPACER;
+    var x2 = margin.left + width - SPACER;
+    var description = year + " target " + unit;
 
     chart
       .append("line")
@@ -175,18 +201,9 @@ function draw(data, targetSelector) {
       .attr("y2", scale_to_use(value))
       .attr("class", "target " + cssClass);
 
-    function addLabel (extraCSSStyle) {
-      chart
-      .append("text")
-      .attr("class", "target-label " + cssClass + " " + extraCSSStyle)
-      .attr("text-anchor", textAnchor)
-      .attr("x", labelX)
-      .attr("y", scale_to_use(value) + 5)
-      .attr("transform", "rotate(0) translate(0,0)")
-      .text(year + " target: " + unit + format(value));
-    }
-    addLabel("shadow-version");
-    addLabel("front-version");
+    // addLabel(cssClass, "shadow-version", pos, scale_to_use, description, value, "");
+    // (useful if the text sits over another line)
+    addLabel(cssClass, "front-version", pos, scale_to_use, description, value, "");
   }
 
   /**
@@ -221,20 +238,20 @@ function draw(data, targetSelector) {
     .rangeBands([margin.left, margin.left + width],0.1,0.8)
     ;
 
-  // TOOL TIP
-  var tip = d3.tip()
-  .attr('class', 'd3-tip')
-  .offset([0, 0])
-  .html(function(d) {
-    return "Grants:<br/>" +
-          "<span style='color:#FFF;'>$" + $.number(d.dollarRunningTotal) + "</span> Total<br />" +
-          "<span style='color:#FFF;'>$" + $.number(d.dollarNew) + "</span> New<br /><br />" +
-          "Potential Webmaker Accounts:<br/>" +
-          "<span style='color:"+color_3+";'>" + $.number(d.peopleRunningTotal) + "</span> Total<br />" +
-          "<span style='color:"+color_3+";'>" + $.number(d.peopleNew) + "</span> New<br /><br />";
-  });
+  // // TOOL TIP
+  // var tip = d3.tip()
+  // .attr('class', 'd3-tip')
+  // .offset([0, 0])
+  // .html(function(d) {
+  //   return "Grants:<br/>" +
+  //         "<span style='color:#FFF;'>$" + $.number(d.dollarRunningTotal) + "</span> Total<br />" +
+  //         "<span style='color:#FFF;'>$" + $.number(d.dollarNew) + "</span> New<br /><br />" +
+  //         "Potential Webmaker Accounts:<br/>" +
+  //         "<span style='color:"+color_3+";'>" + $.number(d.peopleRunningTotal) + "</span> Total<br />" +
+  //         "<span style='color:"+color_3+";'>" + $.number(d.peopleNew) + "</span> New<br /><br />";
+  // });
 
-  chart.call(tip);
+  // chart.call(tip);
 
   /**
    * Patterns
@@ -263,7 +280,7 @@ function draw(data, targetSelector) {
    */
   drawAReferenceLine(y_scale, TARGET_2, 'goal goal-2', 'left', '$', '2015');
   drawAReferenceLine(y_scale, TARGET_1, 'goal goal-1', 'left', '$', '2014');
-  drawAReferenceLine(y_scale_2, TARGET_3, 'goal goal-3', 'right', '', '2014');
+  drawAReferenceLine(y_scale_2, TARGET_3, 'goal goal-3', 'left', '', '2014');
 
   /**
    * BARS
@@ -289,11 +306,11 @@ function draw(data, targetSelector) {
       .attr("width", monthWidth )
       .on("mouseover", function(d, i) {
         d3.select(this).style("opacity", 0.1);
-        tip.show(d);
+        //tip.show(d);
         })
       .on("mouseout", function(d, i) {
         d3.select(this).style("opacity", 0);
-        tip.hide(d);
+        //tip.hide(d);
       });
 
 
@@ -336,9 +353,9 @@ function draw(data, targetSelector) {
   /**
    * NEW - BARS
    */
-  drawBars(1, 2014, 'dollarNew', 'pattern-1', y_scale);
-  drawBars(2, 2015, 'dollarNew', 'pattern-2', y_scale);
-  drawBars(3, 2014, 'peopleNew', 'pattern-3', y_scale_2);
+  // drawBars(1, 2014, 'dollarNew', 'pattern-1', y_scale);
+  // drawBars(2, 2015, 'dollarNew', 'pattern-2', y_scale);
+  // drawBars(3, 2014, 'peopleNew', 'pattern-3', y_scale_2);
 
   /**
    * RUNNING TOTALS - LINES
