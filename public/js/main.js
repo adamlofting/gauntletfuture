@@ -1,4 +1,11 @@
 var GRAPH_DATA_ALL = "/api/all";
+var GRAPH_TARGETS = "/api/targets";
+
+// just some dummy values, these get overwritten on page load/
+// they are managed via an external google doc
+var TARGET_1 = 5000000;
+var TARGET_2 = 5000000;
+var TARGET_3 = 100000;
 
 /**
  * RESPONSIVE
@@ -33,9 +40,6 @@ function dateStringToMonthName(str) {
  */
 function draw(data, targetSelector) {
   var NUMBER_OF_THINGS = 3;
-  var TARGET_1 = 7000000;
-  var TARGET_2 = 7500000;
-  var TARGET_3 = 150000;
 
   var chart = d3.select(targetSelector);
 
@@ -432,6 +436,13 @@ function draw(data, targetSelector) {
 }
 
 // Draw the D3 chart
-d3.json(GRAPH_DATA_ALL, function (data) {
-  draw(data, '#chartAll');
+
+$.get(GRAPH_TARGETS, function( data ) {
+  TARGET_1 = data.targetdollars2014;
+  TARGET_2 = data.targetdollars2015;
+  TARGET_3 = data.targetaccounts2014;
+  // draw the graph after the targets have been set
+  d3.json(GRAPH_DATA_ALL, function (data) {
+    draw(data, '#chartAll');
+  });
 });

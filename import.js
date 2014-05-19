@@ -598,7 +598,10 @@ function importAll (callback) {
   // optional callback
   function(err, results){
     console.log('done');
+    callback(null);
   });
 }
 
-importAll();
+module.exports = {
+  importAll: importAll
+};

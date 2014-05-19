@@ -1,7 +1,7 @@
 var data      = require("./lib/data");
+var importData      = require("./import.js");
 var express = require("express");
 var app = express();
-
 
 app.use(express.static(__dirname + '/public'));
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
@@ -27,6 +27,12 @@ app.get('/api/all', function(req, res) {
 app.get('/api/targets', function(req, res) {
   data.getTargets(function gotTargets (err, result) {
     res.json(result);
+  });
+});
+
+app.get('/refresh', function(req, res) {
+  importData.importAll(function refreshedTargets (err, result) {
+    res.send('<a href="/">Updated</a>');
   });
 });
 
