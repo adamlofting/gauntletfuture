@@ -310,33 +310,33 @@ function processGauntletMainCSV(fetchedCSV, callback) {
       console.log('============');
 
       async.parallel([
-        function(callback){
-          if (amountsToSave.length > 0) {
-            saveAmounts(amountsToSave, src, function savedAmounts(err, res) {
-              if (err) {
-                console.log(err);
-              }
-              console.log('Amounts saved.');
-              callback(null);
-            });
-          }
-        },
-        function(callback){
-          if (allPeopleToSave.length > 0) {
-            savePeopleCounts(allPeopleToSave, src, function savedCounts(err, res) {
-              if (err) {
-                console.log(err);
-              }
-              console.log('Counts saved.');
-              callback(null);
-            });
-          }
-        }
-      ],
-      function(err, results){
-        callback(err);
-      });
 
+          function (callback) {
+            if (amountsToSave.length > 0) {
+              saveAmounts(amountsToSave, src, function savedAmounts(err, res) {
+                if (err) {
+                  console.log(err);
+                }
+                console.log('Amounts saved.');
+                callback(null);
+              });
+            }
+          },
+          function (callback) {
+            if (allPeopleToSave.length > 0) {
+              savePeopleCounts(allPeopleToSave, src, function savedCounts(err, res) {
+                if (err) {
+                  console.log(err);
+                }
+                console.log('Counts saved.');
+                callback(null);
+              });
+            }
+          }
+        ],
+        function (err, results) {
+          callback(err);
+        });
 
     })
     .on('error', function (error) {
@@ -403,7 +403,7 @@ function processGauntletMakerPartyCSV(fetchedCSV, callback) {
 
           if (err) {
             console.log(err);
-            callback (err);
+            callback(err);
           } else {
 
             console.log('Maker Party Counts saved.');
@@ -461,34 +461,35 @@ function processTargetsCSV(fetchedCSV, callback) {
       if (targetsToSave.targetdollars2014 > 0) {
 
         async.series([
-          function(callback){
-            clearTargets(function clearedTargets(err, res) {
-              if (err) {
-                console.log(err);
-                callback (err);
-              } else {
 
-                console.log('Targets Cleared.');
-                callback(null);
-              }
-            });
-          },
-          function(callback){
-            saveTargets(targetsToSave, function savedTargets(err, res) {
-              if (err) {
-                console.log(err);
-                callback (err);
-              } else {
+            function (callback) {
+              clearTargets(function clearedTargets(err, res) {
+                if (err) {
+                  console.log(err);
+                  callback(err);
+                } else {
 
-                console.log('Targets saved.');
-                callback(null);
-              }
-            });
-          }
-        ],
-        function(err, results){
+                  console.log('Targets Cleared.');
+                  callback(null);
+                }
+              });
+            },
+            function (callback) {
+              saveTargets(targetsToSave, function savedTargets(err, res) {
+                if (err) {
+                  console.log(err);
+                  callback(err);
+                } else {
+
+                  console.log('Targets saved.');
+                  callback(null);
+                }
+              });
+            }
+          ],
+          function (err, results) {
             callback(null);
-        });
+          });
 
       } else {
         console.log('No data received in Targets');
@@ -502,7 +503,7 @@ function processTargetsCSV(fetchedCSV, callback) {
     });
 }
 
-function importMainGauntlet (callback) {
+function importMainGauntlet(callback) {
   // get the latest from Google
   request.get('https://docs.google.com/spreadsheet/pub?key=0AvbQej-RMUQMdDFROXprcjNSVlQyV3hLOXRueWM1Qmc&single=true&gid=25&output=csv',
     function (err, res, body) {
@@ -523,7 +524,7 @@ function importMainGauntlet (callback) {
   );
 }
 
-function importMakerPartyGauntlet (callback) {
+function importMakerPartyGauntlet(callback) {
   // get the latest from Google
   request.get('https://docs.google.com/spreadsheets/d/1R76-cRZj1HSLLtyLMAEURdxPkk-qXK9lgJLnSxUUtao/export?format=csv&id=1R76-cRZj1HSLLtyLMAEURdxPkk-qXK9lgJLnSxUUtao&gid=52169416',
     function (err, res, body) {
@@ -544,7 +545,7 @@ function importMakerPartyGauntlet (callback) {
   );
 }
 
-function importTargets (callback) {
+function importTargets(callback) {
   // get the latest from Google
   request.get('https://docs.google.com/spreadsheets/d/1ltIwmMz1oqGAXujCuYUQPNDeZZzQXDm7NCXNJDHhHOA/export?format=csv&id=1ltIwmMz1oqGAXujCuYUQPNDeZZzQXDm7NCXNJDHhHOA&gid=0',
     function (err, res, body) {
@@ -565,9 +566,9 @@ function importTargets (callback) {
   );
 }
 
-function importAll (callback) {
+function importAll(callback) {
   async.series({
-      gauntletMain: function(callback){
+      gauntletMain: function (callback) {
         importMainGauntlet(function importedMainGauntle(err) {
           if (err) {
             console.log(err);
@@ -576,7 +577,7 @@ function importAll (callback) {
           callback(null, null);
         });
       },
-      gauntletMakerParty: function(callback){
+      gauntletMakerParty: function (callback) {
         importMakerPartyGauntlet(function importedMakerPartyGauntle(err) {
           if (err) {
             console.log(err);
@@ -585,7 +586,7 @@ function importAll (callback) {
           callback(null, null);
         });
       },
-      targets: function(callback){
+      targets: function (callback) {
         importTargets(function importedTargets(err) {
           if (err) {
             console.log(err);
@@ -594,12 +595,12 @@ function importAll (callback) {
           callback(null, null);
         });
       }
-  },
-  // optional callback
-  function(err, results){
-    console.log('done');
-    callback(null);
-  });
+    },
+    // optional callback
+    function (err, results) {
+      console.log('done');
+      callback(null);
+    });
 }
 
 module.exports = {
