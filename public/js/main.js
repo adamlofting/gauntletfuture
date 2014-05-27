@@ -87,7 +87,7 @@ function draw(data, targetSelector) {
   /**
    * Add a label (to use with reference line and actual lines)
    */
-  function addLabel (cssClass, extraCSSStyle, pos, scale_to_use, description, value, postfix) {
+  function addLabel (cssClass, extraCSSStyle, pos, scale_to_use, valueForPosition, description, valueForText, postfix) {
       var labelX, textAnchor, nudge;
 
       if (pos === 'right') {
@@ -97,21 +97,24 @@ function draw(data, targetSelector) {
       }
 
       if (pos === 'left') {
-        labelX = margin.left + SPACER - (SPACER/12);
+        labelX = margin.left + SPACER;
         textAnchor = "end";
-        nudge = 5;
+        nudge = 4;
       }
 
       var format = d3.format("0,000");
+      if (valueForText !== "") {
+        valueForText = format(valueForText);
+      }
 
       chart
       .append("text")
       .attr("class", "target-label " + cssClass + " " + extraCSSStyle)
       .attr("text-anchor", textAnchor)
       .attr("x", labelX)
-      .attr("y", scale_to_use(value) + nudge)
+      .attr("y", scale_to_use(valueForPosition) + nudge)
       .attr("transform", "rotate(0) translate(0,0)")
-      .text(description + format(value) + postfix);
+      .text(description + valueForText + postfix);
     }
 
   /**
@@ -153,7 +156,7 @@ function draw(data, targetSelector) {
         })
       )
       .attr("class", "line future-date " + cssClass)
-      .style("stroke-dasharray", ("2, 2"))
+      //.style("stroke-dasharray", ("2, 2"))
       .attr("d", line);
 
     // Points
@@ -182,9 +185,13 @@ function draw(data, targetSelector) {
       .selectAll("points")
       .data(data.filter(function (d) {
           var date = new Date(d.monthCommencing);
-          // get the value for December of this year
+          // get the value for December of this year for end result
           if ((date.getMonth() === 11) && (date.getUTCFullYear() === year)) {
-            addLabel(cssClass, "front-version", "right", scale_to_use, "", d[fieldName], " predicted");
+            addLabel(cssClass, "front-version", "right", scale_to_use, d[fieldName], "", d[fieldName], "");
+          }
+          // get the value for January this year to position year label
+          if ((date.getMonth() === 0) && (date.getUTCFullYear() === year)) {
+            addLabel(cssClass, "front-version", "left", scale_to_use, d[fieldName], year, "", "");
           }
           return;
         }));
@@ -197,7 +204,13 @@ function draw(data, targetSelector) {
 
     var x1 = margin.left + SPACER;
     var x2 = margin.left + width - SPACER;
-    var description = year + " target " + unit;
+    //var description = year + " target " + unit;
+    if (pos === "left") {
+      x1 = margin.left;
+    }
+    if (pos === "right") {
+      x2 = margin.left + width;
+    }
 
     chart
       .append("line")
@@ -205,11 +218,12 @@ function draw(data, targetSelector) {
       .attr("x2", x2)
       .attr("y1", scale_to_use(value))
       .attr("y2", scale_to_use(value))
-      .attr("class", "target " + cssClass);
+      .attr("class", "target " + cssClass)
+      .style("stroke-dasharray", ("2, 2"));
 
-    // addLabel(cssClass, "shadow-version", pos, scale_to_use, description, value, "");
+    // addLabel(cssClass, "shadow-version", pos, scale_to_use, value, description, value, "");
     // (useful if the text sits over another line)
-    addLabel(cssClass, "front-version", pos, scale_to_use, description, value, "");
+    // addLabel(cssClass, "front-version", pos, scale_to_use, value, description, value, "");
   }
 
   /**
@@ -286,7 +300,7 @@ function draw(data, targetSelector) {
    */
   drawAReferenceLine(y_scale, TARGET_2, 'goal goal-2', 'left', '$', '2015');
   drawAReferenceLine(y_scale, TARGET_1, 'goal goal-1', 'left', '$', '2014');
-  drawAReferenceLine(y_scale_2, TARGET_3, 'goal goal-3', 'left', '', '2014');
+  drawAReferenceLine(y_scale_2, TARGET_3, 'goal goal-3', 'right', '', '2014');
 
   /**
    * BARS
@@ -389,19 +403,19 @@ function draw(data, targetSelector) {
     .style("text-anchor", "start");
 
   // Y-AXIS LEFT (dollar scale)
-  // var y_axis = d3.svg.axis()
-  //               .scale(y_scale)
-  //               .orient("left")
-  //               .tickValues(TICK_VALUES)
-  //               .tickFormat(function (d) {
-  //                 var format_number = d3.format(["$", ""]);
-  //                 return format_number(d);
-  //               });
-  // chart
-  // .append("g")
-  //   .attr("class", "y axis y1")
-  //   .attr("transform", "translate(" + margin.left + ", 0 )")
-  // .call(y_axis);
+  var y_axis = d3.svg.axis()
+                .scale(y_scale)
+                .orient("left")
+                .tickValues(TICK_VALUES)
+                .tickFormat(function (d) {
+                  var format_number = d3.format(["$", ""]);
+                  return format_number(d);
+                });
+  chart
+  .append("g")
+    .attr("class", "y axis y1")
+    .attr("transform", "translate(" + margin.left + ", 0 )")
+  .call(y_axis);
 
   // label
   // chart.append("text")
@@ -414,14 +428,14 @@ function draw(data, targetSelector) {
 
 
   // Y-AXIS RIGHT (people scale)
-  // var y_axis_2 = d3.svg.axis()
-  //               .scale(y_scale_2)
-  //               .orient("right");
-  // chart
-  // .append("g")
-  //   .attr("class", "y axis y2")
-  //   .attr("transform", "translate(" + (width + margin.left) + ", 0 )")
-  // .call(y_axis_2);
+  var y_axis_2 = d3.svg.axis()
+                .scale(y_scale_2)
+                .orient("right");
+  chart
+  .append("g")
+    .attr("class", "y axis y2")
+    .attr("transform", "translate(" + (width + margin.left) + ", 0 )")
+  .call(y_axis_2);
 
   // label
   // chart.append("text")
