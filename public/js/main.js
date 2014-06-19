@@ -3,9 +3,9 @@ var GRAPH_TARGETS = "/api/targets";
 
 // just some dummy values, these get overwritten on page load/
 // they are managed via an external google doc
-var TARGET_1 = 5000000;
-var TARGET_2 = 5000000;
-var TARGET_3 = 100000;
+var TARGET_1 = 7000000;
+var TARGET_2 = 8000000;
+var TARGET_3 = 150000;
 
 /**
  * RESPONSIVE
@@ -54,11 +54,11 @@ function draw(data, targetSelector) {
   var color_3 = "#b2df8a";
 
   // Graph settings
-  var Y_SCALE_2_MAX_DEFAULT = Math.round(TARGET_3 * 1.1);
+  var Y_SCALE_2_MAX_DEFAULT = Math.round(TARGET_3 * 1.25);
   var Y_SCALE_MAX_DEFAULT = Math.round(TARGET_1 * 1.25);
-  var TARGET_25_percent = Math.round(TARGET_1 * 0.25),
-    TARGET_50_percent = Math.round(TARGET_1 * 0.5),
-    TARGET_75_percent = Math.round(TARGET_1 * 0.75);
+  // var TARGET_25_percent = Math.round(TARGET_1 * 0.25),
+  //     TARGET_50_percent = Math.round(TARGET_1 * 0.5),
+  //     TARGET_75_percent = Math.round(TARGET_1 * 0.75);
 
   var margin = {
     top: 20,
@@ -74,7 +74,7 @@ function draw(data, targetSelector) {
 
   var VIEWBOX = "0 0 " + (width + margin.horizontal) + " " + (height + margin.vertical);
 
-  var TICK_VALUES = [TARGET_25_percent, TARGET_50_percent, TARGET_75_percent, TARGET_1, Y_SCALE_MAX_DEFAULT];
+  //var TICK_VALUES = [TARGET_25_percent, TARGET_50_percent, TARGET_75_percent, TARGET_1, Y_SCALE_MAX_DEFAULT];
   var SPACER = Math.round(width / 12);
 
   /**
@@ -96,18 +96,18 @@ function draw(data, targetSelector) {
     var labelX, textAnchor, nudge;
 
     if (pos === 'right') {
-      labelX = margin.left + width - (SPACER);
+      labelX = margin.left + width - (SPACER*0.7);
       if (inset) {
-        labelX = margin.left + width - (SPACER*1.7);
+        labelX = margin.left + width - (SPACER*1.6);
       }
       textAnchor = "start";
-      nudge = 3;
+      nudge = 4;
     }
 
     if (pos === 'left') {
-      labelX = margin.left + (SPACER);
+      labelX = margin.left + (SPACER * 0.7);
       if (inset) {
-        labelX = margin.left + (SPACER * 1.8);
+        labelX = margin.left + (SPACER * 1.7);
       }
       textAnchor = "end";
       nudge = 4;
@@ -218,7 +218,7 @@ function draw(data, targetSelector) {
 
     var x1 = margin.left + (SPACER*1.8);
     var x2 = margin.left + width - (SPACER*1.8);
-    var description = year + " target ";
+    var description = "target";
     if (pos === "left") {
       x1 = margin.left;
     }
@@ -254,7 +254,7 @@ function draw(data, targetSelector) {
   }
 
   var y_scale = d3.scale.linear()
-    .range([height + margin.top, margin.top])
+    .range([(height/2) + margin.top, margin.top])
     .domain([0, y_scale_max]);
 
   // Y SCALE RIGHT (people)
@@ -267,7 +267,7 @@ function draw(data, targetSelector) {
   }
 
   var y_scale_2 = d3.scale.linear()
-    .range([height + margin.top, margin.top])
+    .range([height + margin.top, (height/2) + margin.top])
     .domain([0, y_scale_2_max]);
 
   // X SCALE ORDINAL
@@ -431,7 +431,8 @@ function draw(data, targetSelector) {
   var y_axis = d3.svg.axis()
     .scale(y_scale)
     .orient("left")
-    .tickValues(TICK_VALUES)
+    //.tickValues(TICK_VALUES)
+    .ticks(4)
     .tickFormat(function (d) {
       var format_number = d3.format(["$", ""]);
       return format_number(d);
@@ -448,7 +449,7 @@ function draw(data, targetSelector) {
     .attr("text-anchor", "middle")
     .attr("x", 0)
     .attr("y", 0)
-    .attr("transform", "rotate(270) translate(-" + (height/2) + "," + (margin.left/4) + ")")
+    .attr("transform", "rotate(270) translate(-" + (height/4) + "," + (margin.left/4) + ")")
     .text("INCOME");
 
   // Y-AXIS RIGHT (people scale)
@@ -468,7 +469,7 @@ function draw(data, targetSelector) {
     .attr("text-anchor", "middle")
     .attr("x", 0)
     .attr("y", 0)
-    .attr("transform", "rotate(270) translate(-" + (height/2) + "," + (width + margin.left + (margin.right/4*3)) + ")")
+    .attr("transform", "rotate(270) translate(-" + (height/4) * 3 + "," + (width + margin.left + (margin.right/4*3)) + ")")
     .text("USERS");
 
   resize_charts();
