@@ -135,7 +135,7 @@ footer h5 {
 }
 
 .axis {
-  font-size: 12pt;
+  font-size: 10pt;
   font-family: Open Sans;
   font-weight: normal;
 }
@@ -227,7 +227,7 @@ circle {
 }
 
 .target-label {
-  font-size: 12px;
+  font-size: 10px;
 }
 
 .target-label.shadow-version {

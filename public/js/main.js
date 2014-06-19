@@ -11,14 +11,18 @@ var TARGET_3 = 150000;
  * RESPONSIVE
  * Make the SVG charts scale with responsive container divs
  */
-var chartAll = $("#chartAll"),
-  aspectAll = chartAll.width() / chartAll.height(),
-  containerAll = chartAll.parent();
+
 
 function resize_charts() {
-  var targetWidthAll = containerAll.width();
-  chartAll.attr("width", targetWidthAll);
-  chartAll.attr("height", Math.round(targetWidthAll / aspectAll));
+  var chartAll = $("#chartAll"),
+  chartAspect = chartAll.height() / chartAll.width(),
+  containerAll = chartAll.parent();
+
+  var targetWidth = containerAll.width();
+  console.log('targetWidth', targetWidth);
+  console.log(chartAspect);
+  chartAll.attr("width", targetWidth);
+  chartAll.attr("height", Math.round(targetWidth * chartAspect));
 }
 
 $(window).on("resize", function () {
@@ -69,8 +73,8 @@ function draw(data, targetSelector) {
   margin.vertical = margin.top + margin.bottom;
   margin.horizontal = margin.left + margin.right;
 
-  var width = 1200 - margin.horizontal,
-    height = 550 - margin.vertical;
+  var width = 975 - margin.horizontal,
+    height = 480 - margin.vertical;
 
   var VIEWBOX = "0 0 " + (width + margin.horizontal) + " " + (height + margin.vertical);
 
@@ -101,7 +105,7 @@ function draw(data, targetSelector) {
         labelX = margin.left + width - (SPACER*1.6);
       }
       textAnchor = "start";
-      nudge = 4;
+      nudge = 3;
     }
 
     if (pos === 'left') {
@@ -110,7 +114,7 @@ function draw(data, targetSelector) {
         labelX = margin.left + (SPACER * 1.7);
       }
       textAnchor = "end";
-      nudge = 4;
+      nudge = 3;
     }
 
     var format = d3.format("0,000");
