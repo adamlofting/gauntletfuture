@@ -1,14 +1,55 @@
-body,
-svg,
-.dashboard-container {
-  background:  #111;
+body {
+  background:  #FFF;
+  font-size: 14px;
+  line-height: 20px;
 }
 
-h2, h3, h4, h5 {
-  color: #777;
+
+.outer-wrapper {
+  background: url('/img/bg-gradient-sand.png') repeat-x scroll 0% 0%, url('/img/bg-sand.png') repeat scroll 0% 0%, none repeat scroll 0% 0% #F5F1E8;
+  border-top: 2px solid #FFF;
 }
 
+h1 {
+  font-size: 48px;
+  letter-spacing: -2px;
+  line-height: 100%;
+}
+h2 {
+  font-size: 32px;
+  letter-spacing: -1px;
+  line-height: 100%;
+}
 h3 {
+  font-size: 28px;
+  letter-spacing: -0.5px;
+  line-height: 100%;
+}
+h4 {
+  font-size: 24px;
+  letter-spacing: -0.25px;
+  line-height: 100%;
+}
+.small, small {
+  font-size: 12px;
+  line-height: 100%;
+}
+
+h1, h2, h3, h4, h5 {
+  text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.75);
+  color: #484848;
+}
+
+footer h1,
+footer h2,
+footer h3,
+footer h4,
+footer h5 {
+  text-shadow: none;
+  margin-bottom: 20px;
+}
+
+h1, h3 {
   text-align: center;
 }
 
@@ -24,7 +65,7 @@ h3 {
   margin-top: 50px;
   padding-top: 50px;
   padding-bottom: 50px;
-  background: #222;
+  background: #FFF;
 }
 
 .info h4 {
@@ -37,23 +78,27 @@ h3 {
   color: #777;
 }
 
+.info span.people,
+.info span.money {
+  font-weight: bold;
+}
+
 .definition {
   opacity: 0.5;
 }
 
 .wm-footer {
     padding: 40px 0px;
-    background-color: #013E5F;
+    background-color: #FFF;
     color: #FFF;
 }
 
 footer h4 {
-  color: #028ED9;
-  margin-bottom: 5px;
+  /*color: #028ED9;*/
 }
 
 footer h5 {
-  color: #02669D;
+  /*color: #02669D;*/
   margin-top: 5px;
 }
 
@@ -81,11 +126,16 @@ footer h5 {
 
 .axis path {
   fill: none;
-  stroke: rgba(255,255,255,0.2);
+  stroke: #CCC;
   shape-rendering: crispEdges;
 }
+
+.x.axis path {
+  display: none;
+}
+
 .axis {
-  font-size: 8pt;
+  font-size: 12pt;
   font-family: Open Sans;
   font-weight: normal;
 }
@@ -105,8 +155,6 @@ footer h5 {
 .tick line {
   display: none;
 }
-
-
 
 
 
@@ -183,37 +231,42 @@ circle {
 }
 
 .target-label.shadow-version {
-  stroke:#111;
-  stroke-width:8px;
+  stroke:#EDEBE4;
+  stroke-width:4px;
   stroke-linecap:butt;
   stroke-linejoin:miter;
   stroke-opacity:1;
 }
 
+.tick text,
+.label-1,
+.label-3 {
+  fill: #CCC;
+}
+
 /*
-  var color_1 = "#a6cee3";
+  var color_1 = "#27aae1";
   var color_2 = "#1f78b4";
-  var color_3 = "#b2df8a";
+  var color_3 = "#3fb58e";
 */
 
 /* default is Thing-1 */
 span.money {
-  color: #a6cee3;
+  color: #27aae1;
 }
 
-.tick text,
+.y1 .tick text,
 text.line-1,
 rect.bar-1.past-date,
-.label-1,
 .target-label.goal-1  {
-  fill: #a6cee3;
+  fill: #27aae1;
 }
 
 .line.line-1,
 .line.line-1.future-date,
 line.target.goal-1,
 .axis.y1 path {
-  stroke: #a6cee3;
+  stroke: #27aae1;
 }
 
 
@@ -233,22 +286,21 @@ line.target.goal-2 {
 
 /* Thing-3 */
 span.people {
-  color: #b2df8a;
+  color: #3fb58e;
 }
 
 text.line-3,
 rect.bar-3.past-date,
 .y2 .tick text,
-.label-3,
 .target-label.goal-3 {
-  fill: #b2df8a;
+  fill: #3fb58e;
 }
 
 .line.line-3,
 .line.line-3.future-date,
 line.target.goal-3,
 .axis.y2 path {
-  stroke: #b2df8a;
+  stroke: #3fb58e;
 }
 
 

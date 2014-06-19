@@ -7,61 +7,73 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
+        <link href="//mozorg.cdn.mozilla.net/media/css/tabzilla-min.css" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,700" rel="stylesheet">
         <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
         <link href="bower_components/makerstrap/dist/makerstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/main.css?cachekill=20140619">
     </head>
     <body>
+    <div class="outer-wrapper">
 
-
-    <div class=" dashboard-container">
       <div class="container">
         <div class="row">
-          <div class="col-md-12">
-            <h3>MoFo Engagement Pipeline: Predicted <span class='money'>Grants</span> and Webmaker <span class='people'>New&nbsp;User&nbsp;Accounts</span></h3>
-          </div>
-        </div>
-        <div class="row year">
-          <div class="col-md-12" id="graph-container">
-            <svg id="chartAll" preserveAspectRatio="xMidYMid">
-            </svg>
-          </div>
-        </div>
-      </div> <!-- /container -->
-    </div>
-    <footer class="info">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-6" id="graph-container">
-          <h4>About this graph:</h4>
-          <ul>
-            <li>Dashed lines are the targets</li>
-            <li>Prediction data comes from two manually updated Google Docs that combine potential value and likelihood</li>
-            <li>This is just the Webmaker New User Accounts driven by particular activities from the Engagement team (Maker Party Comms Plan)</li>
-          </ul>
-        </div>
-        <div class="col-md-4 col-md-offset-2" id="graph-container">
-          <h4>Related Links:</h4>
-          <ul>
-            <li><a href="https://wiki.mozilla.org/Foundation/Engagement" target="_none">Engagement Team Workbench</a></li>
-            <li><a href="https://github.com/adamlofting/gauntletfuture" target="_none">Github</a></li>
-          </ul>
+            <a href="https://www.mozilla.org/" id="tabzilla">mozilla</a>
         </div>
       </div>
+
+      <div class=" dashboard-container">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-12">
+              <h1>MoFo Engagement Pipeline</h1>
+              <h3>Predicted <span class='money'>Grants Income</span> and Webmaker <span class='people'>New&nbsp;User&nbsp;Accounts</span></h3>
+            </div>
+          </div>
+          <div class="row year">
+            <div class="col-md-12 col-lg-10 col-lg-offset-1" id="graph-container">
+              <svg id="chartAll" preserveAspectRatio="xMidYMid">
+              </svg>
+            </div>
+          </div>
+        </div> <!-- /container -->
+      </div>
+
+      <footer class="info">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6" id="graph-container">
+            <h4>About this graph:</h4>
+            <ul>
+              <li>Prediction data comes from two manually updated Google Docs</li>
+              <li><span class='money'>Grants Income</span> predictions combine the <em>potential value of a grant</em> and the <em>current likelihood</em> of it happening with the date when it is planned to happen</li>
+              <li><span class='people'>Webmaker new user account</span> predictions include current 'organic' growth, plus predicted new accounts from targeted comms activity by the engagement team</li>
+              <li>Historic data is updated with actual results</li>
+            </ul>
+          </div>
+          <div class="col-md-4 col-md-offset-2" id="graph-container">
+            <h4>Related Links:</h4>
+            <ul>
+              <li><a href="https://wiki.mozilla.org/Foundation/Engagement" target="_none">Engagement Team Workbench</a></li>
+              <li><a href="https://github.com/adamlofting/gauntletfuture" target="_none">Sourcecode for this Graph</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      </footer>
     </div>
-    </footer>
 
 
-      <!-- GRAPHING WITH D3 -->
-      <script src="bower_components/d3/d3.min.js"></script>
-      <script src="bower_components/d3-tip/index.js"></script>
+    <!-- GRAPHING WITH D3 -->
+    <script src="bower_components/d3/d3.min.js"></script>
+    <script src="bower_components/d3-tip/index.js"></script>
 
-      <script src="bower_components/jquery/dist/jquery.min.js"></script>
-      <script src="bower_components/jquery-number/jquery.number.min.js"></script>
-      <script src="bower_components/purl/purl.js"></script>
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/jquery-number/jquery.number.min.js"></script>
+    <script src="bower_components/purl/purl.js"></script>
 
-      <script src="js/main.js"></script>
+    <script src="js/main.js?cachekill=20140619"></script>
+    <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
 
-    </body>
+  </body>
 </html>

@@ -62,15 +62,15 @@ function draw(data, targetSelector) {
 
   var margin = {
     top: 20,
-    right: 100,
+    right: 160,
     bottom: 45,
-    left: 100
+    left: 160
   };
   margin.vertical = margin.top + margin.bottom;
   margin.horizontal = margin.left + margin.right;
 
   var width = 1200 - margin.horizontal,
-    height = 600 - margin.vertical;
+    height = 550 - margin.vertical;
 
   var VIEWBOX = "0 0 " + (width + margin.horizontal) + " " + (height + margin.vertical);
 
@@ -92,17 +92,23 @@ function draw(data, targetSelector) {
   /**
    * Add a label (to use with reference line and actual lines)
    */
-  function addLabel(cssClass, extraCSSStyle, pos, scale_to_use, valueForPosition, description, valueForText, postfix) {
+  function addLabel(cssClass, extraCSSStyle, pos, scale_to_use, valueForPosition, description, valueForText, postfix, inset) {
     var labelX, textAnchor, nudge;
 
     if (pos === 'right') {
-      labelX = margin.left + width - SPACER + (SPACER / 12);
+      labelX = margin.left + width - (SPACER);
+      if (inset) {
+        labelX = margin.left + width - (SPACER*1.7);
+      }
       textAnchor = "start";
       nudge = 3;
     }
 
     if (pos === 'left') {
-      labelX = margin.left + SPACER;
+      labelX = margin.left + (SPACER);
+      if (inset) {
+        labelX = margin.left + (SPACER * 1.8);
+      }
       textAnchor = "end";
       nudge = 4;
     }
@@ -195,11 +201,11 @@ function draw(data, targetSelector) {
         var date = new Date(d.monthCommencing);
         // get the value for December of this year for end result
         if ((date.getMonth() === 11) && (date.getUTCFullYear() === year)) {
-          addLabel(cssClass, "front-version", "right", scale_to_use, d[fieldName], "", d[fieldName], "");
+          addLabel(cssClass, "front-version", "right", scale_to_use, d[fieldName], "", d[fieldName], "", true);
         }
         // get the value for January this year to position year label
         if ((date.getMonth() === 0) && (date.getUTCFullYear() === year)) {
-          addLabel(cssClass, "front-version", "left", scale_to_use, d[fieldName], year, "", "");
+          addLabel(cssClass, "front-version", "left", scale_to_use, d[fieldName], year, "", "", true);
         }
         return;
       }));
@@ -210,9 +216,9 @@ function draw(data, targetSelector) {
    */
   function drawAReferenceLine(scale_to_use, value, cssClass, pos, unit, year) {
 
-    var x1 = margin.left + SPACER;
-    var x2 = margin.left + width - SPACER;
-    //var description = year + " target " + unit;
+    var x1 = margin.left + (SPACER*1.8);
+    var x2 = margin.left + width - (SPACER*1.8);
+    var description = year + " target ";
     if (pos === "left") {
       x1 = margin.left;
     }
@@ -229,9 +235,9 @@ function draw(data, targetSelector) {
       .attr("class", "target " + cssClass)
       .style("stroke-dasharray", ("2, 2"));
 
-    // addLabel(cssClass, "shadow-version", pos, scale_to_use, value, description, value, "");
+    addLabel(cssClass, "shadow-version", pos, scale_to_use, value, description, "", "", false);
     // (useful if the text sits over another line)
-    // addLabel(cssClass, "front-version", pos, scale_to_use, value, description, value, "");
+    addLabel(cssClass, "front-version", pos, scale_to_use, value, description, "", "", false);
   }
 
   /**
@@ -267,7 +273,7 @@ function draw(data, targetSelector) {
   // X SCALE ORDINAL
   var x_scale = d3.scale.ordinal()
     .domain(MONTH_NAMES)
-    .rangeBands([margin.left, margin.left + width], 0.1, 0.8);
+    .rangeBands([margin.left, margin.left + width], 0.1, 2);
 
   // // TOOL TIP
   // var tip = d3.tip()
@@ -306,12 +312,6 @@ function draw(data, targetSelector) {
   createPattern('pattern-2', color_2);
   createPattern('pattern-3', color_3);
 
-  /**
-   * REFERENCE LINES
-   */
-  drawAReferenceLine(y_scale, TARGET_2, 'goal goal-2', 'left', '$', '2015');
-  drawAReferenceLine(y_scale, TARGET_1, 'goal goal-1', 'left', '$', '2014');
-  drawAReferenceLine(y_scale_2, TARGET_3, 'goal goal-3', 'right', '', '2014');
 
   /**
    * BARS
@@ -340,13 +340,20 @@ function draw(data, targetSelector) {
     })
     .attr("width", monthWidth)
     .on("mouseover", function (d, i) {
-      d3.select(this).style("opacity", 0.1);
+      d3.select(this).style("opacity", 0.4);
       //tip.show(d);
     })
     .on("mouseout", function (d, i) {
       d3.select(this).style("opacity", 0);
       //tip.hide(d);
     });
+
+    /**
+     * REFERENCE LINES
+     */
+    drawAReferenceLine(y_scale, TARGET_2, 'goal goal-2', 'left', '$', '2015');
+    drawAReferenceLine(y_scale, TARGET_1, 'goal goal-1', 'left', '$', '2014');
+    drawAReferenceLine(y_scale_2, TARGET_3, 'goal goal-3', 'right', '', '2014');
 
   /**
    * Draw bars
@@ -436,18 +443,19 @@ function draw(data, targetSelector) {
     .call(y_axis);
 
   // label
-  // chart.append("text")
-  //   .attr("class", "label-1")
-  //   .attr("text-anchor", "middle")
-  //   .attr("x", 0)
-  //   .attr("y", 0)
-  //   .attr("transform", "rotate(270) translate(-" + (height/2) + "," + (margin.left/4) + ")")
-  //   .text("$ Predicted income: 2014 and 2015");
+  chart.append("text")
+    .attr("class", "label-1")
+    .attr("text-anchor", "middle")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("transform", "rotate(270) translate(-" + (height/2) + "," + (margin.left/4) + ")")
+    .text("INCOME");
 
   // Y-AXIS RIGHT (people scale)
   var y_axis_2 = d3.svg.axis()
     .scale(y_scale_2)
-    .orient("right");
+    .orient("right")
+    .ticks(4);
   chart
     .append("g")
     .attr("class", "y axis y2")
@@ -455,13 +463,13 @@ function draw(data, targetSelector) {
     .call(y_axis_2);
 
   // label
-  // chart.append("text")
-  //   .attr("class", "label-3")
-  //   .attr("text-anchor", "middle")
-  //   .attr("x", 0)
-  //   .attr("y", 0)
-  //   .attr("transform", "rotate(270) translate(-" + (height/2) + "," + (width + margin.left + (margin.right/4*3)) + ")")
-  //   .text("Predicted New Webmaker User Accounts");
+  chart.append("text")
+    .attr("class", "label-3")
+    .attr("text-anchor", "middle")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("transform", "rotate(270) translate(-" + (height/2) + "," + (width + margin.left + (margin.right/4*3)) + ")")
+    .text("USERS");
 
   resize_charts();
 }
