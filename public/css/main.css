@@ -64,7 +64,7 @@ h1, h3 {
 .info {
   margin-top: 50px;
   padding-top: 50px;
-  padding-bottom: 50px;
+  padding-bottom: 200px;
   background: #FFF;
 }
 
@@ -73,9 +73,16 @@ h1, h3 {
 }
 
 .info p,
-.info a,
 .info ul {
   color: #777;
+}
+
+.info a {
+  color: #0095DD;
+}
+
+.info a:hover {
+  color: #00539F;
 }
 
 .info span.people,
@@ -251,7 +258,8 @@ circle {
 */
 
 /* default is Thing-1 */
-span.money {
+span.money,
+a.money {
   color: #27aae1;
 }
 
@@ -285,7 +293,8 @@ line.target.goal-2 {
 
 
 /* Thing-3 */
-span.people {
+span.people,
+a.people {
   color: #3fb58e;
 }
 
