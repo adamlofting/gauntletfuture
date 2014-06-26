@@ -19,8 +19,6 @@ function resize_charts() {
   containerAll = chartAll.parent();
 
   var targetWidth = containerAll.width();
-  console.log('targetWidth', targetWidth);
-  console.log(chartAspect);
   chartAll.attr("width", targetWidth);
   chartAll.attr("height", Math.round(targetWidth * chartAspect));
 }
@@ -34,7 +32,8 @@ var MONTH_NAMES = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP"
 
 function dateStringToMonthName(str) {
   var date = new Date(str);
-  return MONTH_NAMES[date.getMonth()];
+  var monthName = MONTH_NAMES[date.getUTCMonth()];
+  return monthName;
 }
 
 /**
@@ -50,7 +49,7 @@ function draw(data, targetSelector) {
   // utitlity vars
   var now = new Date();
   var lastMonth = new Date();
-  lastMonth.setDate(now.getDate() - 31);
+  lastMonth.setDate(now.getUTCDate() - 31);
 
   // Color (from colorBrewer palletes)
   var color_1 = "#a6cee3";
@@ -204,11 +203,11 @@ function draw(data, targetSelector) {
       .data(data.filter(function (d) {
         var date = new Date(d.monthCommencing);
         // get the value for December of this year for end result
-        if ((date.getMonth() === 11) && (date.getUTCFullYear() === year)) {
+        if ((date.getUTCMonth() === 11) && (date.getUTCFullYear() === year)) {
           addLabel(cssClass, "front-version", "right", scale_to_use, d[fieldName], "", d[fieldName], "", true);
         }
         // get the value for January this year to position year label
-        if ((date.getMonth() === 0) && (date.getUTCFullYear() === year)) {
+        if ((date.getUTCMonth() === 0) && (date.getUTCFullYear() === year)) {
           addLabel(cssClass, "front-version", "left", scale_to_use, d[fieldName], year, "", "", true);
         }
         return;
@@ -254,7 +253,7 @@ function draw(data, targetSelector) {
     return d.dollarRunningTotal;
   });
   if (extent_dollars[1] > y_scale_max) {
-    y_scale_max = extent_dollars[1];
+    y_scale_max = extent_dollars[1] * 1.15;
   }
 
   var y_scale = d3.scale.linear()
@@ -267,7 +266,7 @@ function draw(data, targetSelector) {
     return d.peopleRunningTotal;
   });
   if (extent_people[1] > y_scale_2_max) {
-    y_scale_2_max = extent_people[1];
+    y_scale_2_max = extent_people[1] * 1.15;
   }
 
   var y_scale_2 = d3.scale.linear()
@@ -454,7 +453,7 @@ function draw(data, targetSelector) {
     .attr("x", 0)
     .attr("y", 0)
     .attr("transform", "rotate(270) translate(-" + (height/4) + "," + (margin.left/4) + ")")
-    .text("INCOME");
+    .text("INCOME : USD");
 
   // Y-AXIS RIGHT (people scale)
   var y_axis_2 = d3.svg.axis()
