@@ -120,8 +120,13 @@ h1, h3 {
 }
 
 #legend p {
-  font-size: 10px;
+  font-size: 11px;
   color: #999;
+  line-height: 13px;
+}
+
+#legend span.legend {
+
 }
 
 
@@ -303,9 +308,12 @@ rect.bar-1.past-date,
   stroke: #27aae1;
 }
 
-#legend h5.target-1,
-#legend h5.target-2 {
+#legend h5.target-1 {
   color: #27AAE1;
+}
+
+#legend h5.target-2 {
+  color: #1F78B4;
 }
 
 
