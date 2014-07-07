@@ -2,6 +2,7 @@ body {
   background:  #FFF;
   font-size: 14px;
   line-height: 20px;
+  background: url('/img/bg-gradient-sand.png') repeat-x scroll 0% 0%, url('/img/bg-sand.png') repeat scroll 0% 0%, none repeat scroll 0% 0% #F5F1E8;
 }
 
 
@@ -54,7 +55,7 @@ h1, h3 {
 }
 
 .dashboard-container {
-  padding: 20px 0 40px;
+  padding: 0 0 40px;
 }
 
 .current-numbers {
@@ -99,6 +100,35 @@ h1, h3 {
     background-color: #FFF;
     color: #FFF;
 }
+
+#legend {
+  background: #F8F7F3;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+#legend h4 {
+  font-size: 12px;
+  text-transform: uppercase;
+  text-align: center;
+  color: #999;
+}
+
+#legend h5 {
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+#legend p {
+  font-size: 11px;
+  color: #999;
+  line-height: 13px;
+}
+
+#legend span.legend {
+
+}
+
 
 footer h4 {
   /*color: #028ED9;*/
@@ -165,6 +195,10 @@ footer h5 {
 
 
 
+line.today {
+  stroke: #FFF;
+}
+
 
 line.target {
     fill: none;
@@ -222,8 +256,6 @@ rect.info-area {
   margin-top: 30px;
 }
 
-
-
 circle {
   stroke: none;
 }
@@ -272,9 +304,16 @@ rect.bar-1.past-date,
 
 .line.line-1,
 .line.line-1.future-date,
-line.target.goal-1,
 .axis.y1 path {
   stroke: #27aae1;
+}
+
+#legend h5.target-1 {
+  color: #27AAE1;
+}
+
+#legend h5.target-2 {
+  color: #1F78B4;
 }
 
 
@@ -286,8 +325,7 @@ rect.bar-2.past-date,
 }
 
 .line.line-2,
-.line.line-2.future-date,
-line.target.goal-2 {
+.line.line-2.future-date {
   stroke: #1f78b4;
 }
 
@@ -307,9 +345,38 @@ rect.bar-3.past-date,
 
 .line.line-3,
 .line.line-3.future-date,
-line.target.goal-3,
 .axis.y2 path {
   stroke: #3fb58e;
+}
+
+#legend h5.target-3 {
+  color: #3fb58e;
+}
+
+/* Target lines */
+line.target.goal-1,
+line.target.goal-3 {
+  stroke: #FFC637;
+}
+
+circle.goal {
+  fill: #FFC637;
+}
+
+line.target.goal-2 {
+  stroke: #E68D4B;
+}
+
+circle.goal.goal-2 {
+  fill: #E68D4B;
+}
+
+text.target-point.goal {
+  fill: #FFF;
+}
+
+.future-date {
+  opacity: 0.5;
 }
 
 
