@@ -7,6 +7,9 @@ var TARGET_1 = 7000000;
 var TARGET_2 = 8000000;
 var TARGET_3 = 150000;
 
+var SCALE_1_ICON = '\uf155';
+var SCALE_2_ICON = '\uf007';
+
 /**
  * RESPONSIVE
  * Make the SVG charts scale with responsive container divs
@@ -57,7 +60,7 @@ function draw(data, targetSelector) {
   var color_3 = "#b2df8a";
 
   // Graph settings
-  var Y_SCALE_2_MAX_DEFAULT = Math.round(TARGET_3 * 1.25);
+  var Y_SCALE_2_MAX_DEFAULT = 500000;
   var Y_SCALE_MAX_DEFAULT = Math.round(TARGET_1 * 1.25);
   // var TARGET_25_percent = Math.round(TARGET_1 * 0.25),
   //     TARGET_50_percent = Math.round(TARGET_1 * 0.5),
@@ -91,29 +94,59 @@ function draw(data, targetSelector) {
   /**
    * FUNCTIONS
    */
+   function addTargetPoint (value, pos, scale_to_use, label, cssClass) {
+    var y = scale_to_use(value);
+    var x = margin.left;
+    if (pos === "right") {
+      x = width + margin.left;
+    }
+    var icon = SCALE_1_ICON;
+    if (scale_to_use === y_scale_2) {
+      icon = SCALE_2_ICON;
+    }
+     chart
+      .append("circle")
+      .attr("cx", x)
+      .attr("cy", y)
+      .attr("r", "9")
+      .attr("class", cssClass);
+    chart
+      .append("text")
+      .attr("class", 'target-point ' + cssClass)
+      .attr("text-align", "center")
+      .attr("x", (x -3))
+      .attr("y", (y+4))
+      .attr('font-family', 'FontAwesome')
+      .attr('font-size', '0.7em')
+      .text(icon);
+   }
 
   /**
    * Add a label (to use with reference line and actual lines)
    */
-  function addLabel(cssClass, extraCSSStyle, pos, scale_to_use, valueForPosition, description, valueForText, postfix, inset) {
+  function addLabel(cssClass, pos, scale_to_use, valueForPosition, description, valueForText, postfix, inset) {
     var labelX, textAnchor, nudge;
 
+    nudge = -6;
+
     if (pos === 'right') {
-      labelX = margin.left + width - (SPACER*0.7);
+      labelX = margin.left + width - 10;
+      textAnchor = "end";
       if (inset) {
         labelX = margin.left + width - (SPACER*1.6);
+        nudge = 3;
+        textAnchor = "start";
       }
-      textAnchor = "start";
-      nudge = 3;
     }
 
     if (pos === 'left') {
-      labelX = margin.left + (SPACER * 0.7);
+      labelX = margin.left + 10;
+      textAnchor = "start";
       if (inset) {
         labelX = margin.left + (SPACER * 1.7);
+        nudge = 3;
+        textAnchor = "end";
       }
-      textAnchor = "end";
-      nudge = 3;
     }
 
     var format = d3.format("0,000");
@@ -123,7 +156,7 @@ function draw(data, targetSelector) {
 
     chart
       .append("text")
-      .attr("class", "target-label " + cssClass + " " + extraCSSStyle)
+      .attr("class", "target-label " + cssClass)
       .attr("text-anchor", textAnchor)
       .attr("x", labelX)
       .attr("y", scale_to_use(valueForPosition) + nudge)
@@ -172,8 +205,8 @@ function draw(data, targetSelector) {
         );
       }))
       .attr("class", "line future-date " + cssClass)
-    //.style("stroke-dasharray", ("2, 2"))
-    .attr("d", line);
+      .style("stroke-dasharray", ("2, 2"))
+      .attr("d", line);
 
     // Points
     chart
@@ -193,8 +226,8 @@ function draw(data, targetSelector) {
         return icon;
       })
       .attr("transform", function (d) {
-        return "translate(" + (x_scale(dateStringToMonthName(d.monthCommencing)) + halfMonth) + "," +
-          (scale_to_use(d[fieldName]) + 3) + ")";
+        return "translate(" + (x_scale(dateStringToMonthName(d.monthCommencing)) + (halfMonth-4)) + "," +
+          (scale_to_use(d[fieldName]) + 4) + ")";
       })
       .attr("class", cssClass);
 
@@ -204,11 +237,11 @@ function draw(data, targetSelector) {
         var date = new Date(d.monthCommencing);
         // get the value for December of this year for end result
         if ((date.getUTCMonth() === 11) && (date.getUTCFullYear() === year)) {
-          addLabel(cssClass, "front-version", "right", scale_to_use, d[fieldName], "", d[fieldName], "", true);
+          addLabel(cssClass + " front-version", "right", scale_to_use, d[fieldName], "", d[fieldName], "", true);
         }
         // get the value for January this year to position year label
         if ((date.getUTCMonth() === 0) && (date.getUTCFullYear() === year)) {
-          addLabel(cssClass, "front-version", "left", scale_to_use, d[fieldName], year, "", "", true);
+          addLabel(cssClass + " front-version", "left", scale_to_use, d[fieldName], year, "", "", true);
         }
         return;
       }));
@@ -221,11 +254,13 @@ function draw(data, targetSelector) {
 
     var x1 = margin.left + (SPACER*1.8);
     var x2 = margin.left + width - (SPACER*1.8);
-    var description = "target";
+    var description = "TARGET " + year;
     if (pos === "left") {
       x1 = margin.left;
+      //x2 = margin.left + (width/2);
     }
     if (pos === "right") {
+      x1 = margin.left + (width/2);
       x2 = margin.left + width;
     }
 
@@ -235,12 +270,14 @@ function draw(data, targetSelector) {
       .attr("x2", x2)
       .attr("y1", scale_to_use(value))
       .attr("y2", scale_to_use(value))
-      .attr("class", "target " + cssClass)
-      .style("stroke-dasharray", ("2, 2"));
+      .attr("class", "target " + cssClass);
+      //.style("stroke-dasharray", ("2, 2"));
 
-    addLabel(cssClass, "shadow-version", pos, scale_to_use, value, description, "", "", false);
+    addLabel(cssClass + " shadow-version", pos, scale_to_use, value, description, "", "", false);
     // (useful if the text sits over another line)
-    addLabel(cssClass, "front-version", pos, scale_to_use, value, description, "", "", false);
+    addLabel(cssClass + " front-version", pos, scale_to_use, value, description, "", "", false);
+
+    addTargetPoint (value, pos, scale_to_use, '$', cssClass);
   }
 
   /**
@@ -257,7 +294,7 @@ function draw(data, targetSelector) {
   }
 
   var y_scale = d3.scale.linear()
-    .range([(height/2) + margin.top, margin.top])
+    .range([height + margin.top, margin.top])
     .domain([0, y_scale_max]);
 
   // Y SCALE RIGHT (people)
@@ -270,13 +307,21 @@ function draw(data, targetSelector) {
   }
 
   var y_scale_2 = d3.scale.linear()
-    .range([height + margin.top, (height/2) + margin.top])
+    .range([height + margin.top, margin.top])
     .domain([0, y_scale_2_max]);
 
   // X SCALE ORDINAL
   var x_scale = d3.scale.ordinal()
     .domain(MONTH_NAMES)
     .rangeBands([margin.left, margin.left + width], 0.1, 2);
+
+  var x_date_start = x_scale.range()[0];
+  var x_date_end = x_scale.range()[x_scale.range().length-1] + x_scale.rangeBand();
+
+  // X SCALE DATE
+  var x_scale_date = d3.time.scale()
+    .domain([new Date(2014,01,01), new Date(2014,12,31)])
+    .range([x_date_start, x_date_end]);
 
   // // TOOL TIP
   // var tip = d3.tip()
@@ -323,6 +368,22 @@ function draw(data, targetSelector) {
   //var partMonth = (monthWidth / NUMBER_OF_THINGS);
   var halfMonth = (monthWidth / 2);
 
+
+  var testDate = new Date(2014,07,07);
+  console.log('now', now);
+  console.log('testDate', testDate);
+
+  /**
+   * TODAY
+   */
+  chart
+    .append("line")
+    .attr("x1", x_scale(dateStringToMonthName(now)) + halfMonth)
+    .attr("x2", x_scale(dateStringToMonthName(now)) + halfMonth)
+    .attr("y1", margin.top)
+    .attr("y2", height + margin.top)
+    .attr("class", "today");
+
   /**
    * HOVER INFO BARS
    */
@@ -351,11 +412,77 @@ function draw(data, targetSelector) {
       //tip.hide(d);
     });
 
+
+  /**
+   * AXIS
+   */
+  var x_axis = d3.svg.axis()
+    .scale(x_scale);
+
+  chart
+    .append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + (height + margin.top) + ")")
+    .call(x_axis)
+    .selectAll("text") // rotate text
+  .attr("y", 0)
+    .attr("x", 0)
+    .attr("dy", ".35em")
+    .attr("transform", "rotate(0) translate(-13,20)")
+    .style("text-anchor", "start");
+
+  // Y-AXIS LEFT (dollar scale)
+  var y_axis = d3.svg.axis()
+    .scale(y_scale)
+    .orient("left")
+    //.tickValues(TICK_VALUES)
+    .ticks(4)
+    .tickFormat(function (d) {
+      var format_number = d3.format(["$", ""]);
+      return format_number(d);
+    });
+  chart
+    .append("g")
+    .attr("class", "y axis y1")
+    .attr("transform", "translate(" + margin.left + ", 0 )")
+    .call(y_axis);
+
+  // label
+  chart.append("text")
+    .attr("class", "label-1")
+    .attr("text-anchor", "middle")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("transform", "rotate(270) translate(-" + (height/2) + "," + (margin.left/4) + ")")
+    .text("INCOME : USD");
+
+  // Y-AXIS RIGHT (people scale)
+  var y_axis_2 = d3.svg.axis()
+    .scale(y_scale_2)
+    .orient("right")
+    .ticks(6);
+  chart
+    .append("g")
+    .attr("class", "y axis y2")
+    .attr("transform", "translate(" + (width + margin.left) + ", 0 )")
+    .call(y_axis_2);
+
+  // label
+  chart.append("text")
+    .attr("class", "label-3")
+    .attr("text-anchor", "middle")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("transform", "rotate(270) translate(-" + (height/2) + "," + (width + margin.left + (margin.right/4*3)) + ")")
+    .text("USERS");
+
+
     /**
      * REFERENCE LINES
      */
-    drawAReferenceLine(y_scale, TARGET_2, 'goal goal-2', 'left', '$', '2015');
-    drawAReferenceLine(y_scale, TARGET_1, 'goal goal-1', 'left', '$', '2014');
+    //drawAReferenceLine(y_scale, TARGET_2, 'goal goal-2', 'left', '$', '2015');
+    //drawAReferenceLine(y_scale, TARGET_1, 'goal goal-1', 'left', '$', '2014');
+    drawAReferenceLine(y_scale, TARGET_1, 'goal goal-1', 'left', '$', '2014 & 2015');
     drawAReferenceLine(y_scale_2, TARGET_3, 'goal goal-3', 'right', '', '2014');
 
   /**
@@ -408,72 +535,9 @@ function draw(data, targetSelector) {
   /**
    * RUNNING TOTALS - LINES
    */
-  drawALine(1, "dollarRunningTotal", y_scale, 2014, '\uf155');
-  drawALine(2, "dollarRunningTotal", y_scale, 2015, '\uf155');
-  drawALine(3, "peopleRunningTotal", y_scale_2, 2014, '\uf007');
-
-  /**
-   * AXIS
-   */
-  var x_axis = d3.svg.axis()
-    .scale(x_scale);
-
-  chart
-    .append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + (height + margin.top) + ")")
-    .call(x_axis)
-    .selectAll("text") // rotate text
-  .attr("y", 0)
-    .attr("x", 0)
-    .attr("dy", ".35em")
-    .attr("transform", "rotate(0) translate(-13,20)")
-    .style("text-anchor", "start");
-
-  // Y-AXIS LEFT (dollar scale)
-  var y_axis = d3.svg.axis()
-    .scale(y_scale)
-    .orient("left")
-    //.tickValues(TICK_VALUES)
-    .ticks(4)
-    .tickFormat(function (d) {
-      var format_number = d3.format(["$", ""]);
-      return format_number(d);
-    });
-  chart
-    .append("g")
-    .attr("class", "y axis y1")
-    .attr("transform", "translate(" + margin.left + ", 0 )")
-    .call(y_axis);
-
-  // label
-  chart.append("text")
-    .attr("class", "label-1")
-    .attr("text-anchor", "middle")
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("transform", "rotate(270) translate(-" + (height/4) + "," + (margin.left/4) + ")")
-    .text("INCOME : USD");
-
-  // Y-AXIS RIGHT (people scale)
-  var y_axis_2 = d3.svg.axis()
-    .scale(y_scale_2)
-    .orient("right")
-    .ticks(4);
-  chart
-    .append("g")
-    .attr("class", "y axis y2")
-    .attr("transform", "translate(" + (width + margin.left) + ", 0 )")
-    .call(y_axis_2);
-
-  // label
-  chart.append("text")
-    .attr("class", "label-3")
-    .attr("text-anchor", "middle")
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("transform", "rotate(270) translate(-" + (height/4) * 3 + "," + (width + margin.left + (margin.right/4*3)) + ")")
-    .text("USERS");
+  drawALine(1, "dollarRunningTotal", y_scale, 2014, SCALE_1_ICON);
+  drawALine(2, "dollarRunningTotal", y_scale, 2015, SCALE_1_ICON);
+  drawALine(3, "peopleRunningTotal", y_scale_2, 2014, SCALE_2_ICON);
 
   resize_charts();
 }
