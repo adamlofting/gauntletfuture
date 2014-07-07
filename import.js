@@ -24,14 +24,14 @@ function saveAmount(amount, callback) {
 
     if (err) {
       console.error(err);
-      callback(err);
+      return callback(err);
 
     } else {
 
       connection.query('INSERT INTO amounts SET ?', amount, function (err, result) {
         if (err) {
           console.error(err);
-          callback(err);
+          return callback(err);
         }
         connection.end();
         callback(null);
@@ -46,14 +46,14 @@ function clearAmounts(src, callback) {
 
     if (err) {
       console.error(err);
-      callback(err);
+      return callback(err);
 
     } else {
 
       connection.query('DELETE FROM gauntlet.amounts WHERE src=?;', src, function (err, result) {
         if (err) {
           console.error(err);
-          callback(err);
+          return callback(err);
         }
         connection.end();
         callback(null);
@@ -95,14 +95,14 @@ function savePeopleCount(count, callback) {
 
     if (err) {
       console.error(err);
-      callback(err);
+      return callback(err);
 
     } else {
 
       connection.query('INSERT INTO people SET ?', count, function (err, result) {
         if (err) {
           console.error(err);
-          callback(err);
+          return callback(err);
         }
         connection.end();
         callback(null);
@@ -117,14 +117,14 @@ function clearPeopleCounts(src, callback) {
 
     if (err) {
       console.error(err);
-      callback(err);
+      return callback(err);
 
     } else {
 
       connection.query('DELETE FROM gauntlet.people WHERE src=?;', src, function (err, result) {
         if (err) {
           console.error(err);
-          callback(err);
+          return callback(err);
         }
         connection.end();
         callback(null);
@@ -166,14 +166,14 @@ function saveTargets(targets, callback) {
 
     if (err) {
       console.error(err);
-      callback(err);
+      return callback(err);
 
     } else {
 
       connection.query('INSERT INTO targets SET ?', targets, function (err, result) {
         if (err) {
           console.error(err);
-          callback(err);
+          return callback(err);
         }
         connection.end();
         callback(null);
@@ -189,13 +189,13 @@ function clearTargets(callback) {
 
     if (err) {
       console.error(err);
-      callback(err);
+      return callback(err);
 
     } else {
       connection.query('TRUNCATE targets', function (err, result) {
         if (err) {
           console.error(err);
-          callback(err);
+          return callback(err);
         }
         connection.end();
         callback(null);
@@ -466,7 +466,7 @@ function processTargetsCSV(fetchedCSV, callback) {
               clearTargets(function clearedTargets(err, res) {
                 if (err) {
                   console.log(err);
-                  callback(err);
+                  return callback(err);
                 } else {
 
                   console.log('Targets Cleared.');
@@ -478,7 +478,7 @@ function processTargetsCSV(fetchedCSV, callback) {
               saveTargets(targetsToSave, function savedTargets(err, res) {
                 if (err) {
                   console.log(err);
-                  callback(err);
+                  return callback(err);
                 } else {
 
                   console.log('Targets saved.');
@@ -512,7 +512,7 @@ function importMainGauntlet(callback) {
         processGauntletMainCSV(csv, function processedCSV(err) {
           if (err) {
             console.log(err);
-            callback(err);
+            return callback(err);
           }
           callback(null);
         });
@@ -533,7 +533,7 @@ function importMakerPartyGauntlet(callback) {
         processGauntletMakerPartyCSV(csv, function processedCSV(err) {
           if (err) {
             console.log(err);
-            callback(err);
+            return callback(err);
           }
           callback(null);
         });
@@ -554,7 +554,7 @@ function importTargets(callback) {
         processTargetsCSV(csv, function processedCSV(err) {
           if (err) {
             console.log(err);
-            callback(err);
+            return callback(err);
           }
           callback(null);
         });
