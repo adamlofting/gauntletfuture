@@ -152,8 +152,8 @@ footer h5 {
 
 @media (min-width: 1200px) {
   #legend {
-    padding-top: 50px;
-    padding-bottom: 50px;
+    padding-top: 30px;
+    padding-bottom: 30px;
   }
   #legend h4 {
     padding-bottom: 30px;
